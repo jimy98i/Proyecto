@@ -1,0 +1,245 @@
+.profile-main {
+  min-height: calc(100vh - 76px);
+  background-color: #f5f5f5;
+  padding: 2rem 0;
+}
+
+.profile-container {
+  height: 100%;
+}
+
+.profile-row {
+  min-height: calc(100vh - 76px - 4rem);
+}
+
+.profile-content-col {
+  padding-right: 2rem;
+}
+
+.profile-sidebar-col {
+  padding-left: 0;
+}
+
+.profile-sidebar {
+  background-color: #d4f1f4;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  position: sticky;
+  top: 2rem;
+}
+
+.profile-content {
+  background-color: #ffffff;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-height: calc(100vh - 76px - 4rem);
+}
+
+.profile-image-container {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 3px solid #00796b;
+}
+
+.profile-image-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #e0f7fa;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00796b;
+  border: 3px solid #00796b;
+}
+
+.image-upload-input {
+  display: none;
+}
+
+.image-upload-label {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: #00796b;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.image-upload-label:hover {
+  background-color: #004d40;
+  transform: scale(1.1);
+}
+
+.profile-nav-link {
+  color: #004d40;
+  margin-bottom: 0.5rem;
+  border-radius: 5px;
+  transition: all 0.3s;
+  text-align: left;
+  padding: 0.75rem 1rem;
+}
+
+.profile-nav-link:hover {
+  background-color: #e0f7fa;
+  color: #004d40;
+}
+
+.profile-nav-link.active {
+  background-color: #00796b;
+  color: white;
+}
+
+.profile-input {
+  border: 1px solid #b2dfdb;
+  border-radius: 5px;
+  padding: 0.5rem;
+  transition: border-color 0.3s;
+}
+
+.profile-input:focus {
+  border-color: #00796b;
+  box-shadow: 0 0 0 0.2rem rgba(0, 121, 107, 0.25);
+}
+
+.profile-button {
+  background-color: #00796b;
+  border-color: #00796b;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 5px;
+  transition: all 0.3s;
+}
+
+.profile-button:hover {
+  background-color: #004d40;
+  border-color: #004d40;
+}
+
+.pet-card {
+  border: 1px solid #b2dfdb;
+  transition: transform 0.3s;
+}
+
+.pet-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.history-card {
+  border: 1px solid #b2dfdb;
+}
+
+.history-card .card-header {
+  background-color: #e0f7fa;
+  border-bottom: 1px solid #b2dfdb;
+}
+
+.history-timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.history-timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #b2dfdb;
+}
+
+.history-item {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.history-item::before {
+  content: '';
+  position: absolute;
+  left: -34px;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #00796b;
+  border: 2px solid #ffffff;
+}
+
+.history-date {
+  color: #00796b;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.history-content {
+  background-color: #f5f5f5;
+  padding: 1rem;
+  border-radius: 5px;
+}
+
+.history-content h6 {
+  color: #004d40;
+  margin-bottom: 0.5rem;
+}
+
+/* Estilos para los botones de editar y eliminar mascotas */
+.btn-outline-primary {
+  color: #00796b;
+  border-color: #00796b;
+}
+
+.btn-outline-primary:hover {
+  background-color: #00796b;
+  border-color: #00796b;
+  color: white;
+}
+
+.btn-outline-danger {
+  color: #d32f2f;
+  border-color: #d32f2f;
+}
+
+.btn-outline-danger:hover {
+  background-color: #d32f2f;
+  border-color: #d32f2f;
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .profile-content-col {
+    padding-right: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .profile-sidebar-col {
+    padding-left: 1rem;
+  }
+
+  .profile-sidebar {
+    position: relative;
+    top: 0;
+  }
+} 

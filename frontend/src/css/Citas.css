@@ -1,0 +1,55 @@
+/* Estilos para el componente Citas */
+
+.citas-container {
+    background-color: #e1e1e1;
+    padding: 20px;
+    border-radius: 5px;
+}
+h2 {
+    font-size: 2rem;
+    color: #333333;
+    font-weight: bold;
+    text-align: center;
+    font-weight: bold;
+}
+p {
+    font-size: 1.2rem;
+    color: #333333;
+}
+
+.citas-section {
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.citas-section h1 {
+    font-size: 2rem;
+    color: #333333;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.citas-section p {
+    font-size: 1.2rem;
+    color: #666666;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.export-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.calendar-container {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}

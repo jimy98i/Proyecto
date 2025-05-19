@@ -1,0 +1,243 @@
+/* Estilos para el LayoutAdmin */
+
+/* Fondo del menú lateral */
+.bg-light {
+    background-color: #1a252f !important; /* Fondo oscuro */
+    color: #c7c7c7; /* Letras claras */
+    transition: transform 0.3s ease-in-out; /* Animación para mostrar/ocultar */
+    width: 100px; /* Ancho fijo */;
+}
+
+/* Links del menú lateral */
+.bg-light .nav-link {
+    color: #2c3e50; /* Azul marino oscuro */
+    font-weight: bold;
+    padding: 10px 15px;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover en los links del menú lateral */
+.bg-light .nav-link:hover {
+    background-color: #ecf0f1; /* Fondo claro */
+    color: #2c3e50; /* Azul marino oscuro */
+}
+
+/* Fondo del Navbar */
+.navbar-dark {
+    background-color: #1a252f !important; /* Azul marino más oscuro */
+    height: auto; /* Ajustar altura automáticamente */
+    padding: 0.5rem 1rem; /* Reducir el padding */
+}
+
+/* Botón de las tres barras */
+.btn-outline-light {
+    border-color: #ecf0f1;
+    color: #ecf0f1;
+}
+
+.btn-outline-light:hover {
+    background-color: #34495e;
+    color: #ffffff;
+}
+
+/* Títulos y textos */
+h1 {
+    color: #2c3e50; /* Azul marino oscuro */
+}
+
+p {
+    color: #7f8c8d; /* Gris medio */
+}
+
+/* Ajustes responsivos para el LayoutAdmin */
+
+/* Ocultar el menú lateral en pantallas pequeñas */
+@media (max-width: 768px) {
+    .bg-light {
+        display: none;
+    }
+
+    .col-12 {
+        width: 100%;
+    }
+
+    .p-4 {
+        padding: 1rem;
+    }
+}
+
+/* Ajustar el botón de las tres barras en pantallas pequeñas */
+@media (max-width: 768px) {
+    .btn-outline-light {
+        font-size: 1.2rem;
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Ajustar el texto y los títulos en pantallas pequeñas */
+@media (max-width: 768px) {
+    h1 {
+        font-size: calc(1.5rem + 1vw); /* Ajustar el tamaño del texto dinámicamente */
+    }
+
+    p {
+        font-size: calc(1rem + 0.5vw); /* Ajustar el tamaño del texto dinámicamente */
+    }
+}
+
+/* Ajustes para el menú desplegable en versión móvil */
+@media (max-width: 768px) {
+    .bg-light {
+        display: block;
+        position: absolute;
+        top: 56px; /* Ajustar debajo del navbar */
+        left: 0;
+        /* width: 100%; */
+        height: auto; /* Ajustar altura automáticamente */
+        z-index: 1000;
+    }
+
+    .bg-light .nav-link {
+        color: #ecf0f1; /* Asegurar que las letras sean visibles */
+        text-align: center; /* Centrar los links */
+        padding: 15px 0;
+    }
+
+    .bg-light .nav-link:hover {
+        background-color: #34495e;
+        color: #ffffff;
+    }
+}
+
+/* Ajustes para el calendario en formato móvil */
+@media (max-width: 768px) {
+    .fc {
+        font-size: 0.8rem; /* Reducir el tamaño de fuente */
+    }
+
+    .fc-toolbar {
+        flex-wrap: wrap; /* Permitir que las herramientas se ajusten */
+    }
+
+    .fc-toolbar-chunk {
+        margin-bottom: 0.5rem; /* Espaciado entre herramientas */
+    }
+
+    .fc-daygrid-event {
+        font-size: 0.7rem; /* Reducir el tamaño de los eventos */
+    }
+}
+
+/* Ajustar el ancho de la barra lateral del menú */
+@media (min-width: 768px) {
+    .bg-light {
+        width: 100px; /* Reducir el ancho de la barra lateral */
+    }
+
+    .col-12 {
+        margin-left: 200px; /* Ajustar el contenido principal */
+    }
+}
+
+/* Estilos generales para el LayoutAdmin */
+.layout-admin {
+    display: grid;
+    grid-template-areas:
+        "sidebar header"
+        "sidebar content"
+        "footer footer";
+    grid-template-columns: 250px 1fr;
+    grid-template-rows: auto 1fr auto;
+    height: 100vh;
+}
+
+.sidebar {
+    grid-area: sidebar;
+    background-color: #1a252f; /* Azul oscuro */
+    color: #ecf0f1; /* Texto claro */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+}
+
+.sidebar .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+
+.sidebar .menu button {
+    background: none;
+    border: none;
+    color: #ecf0f1;
+    font-size: 1rem;
+    margin: 0.5rem 0;
+    cursor: pointer;
+    text-transform: uppercase;
+    width: 100%;
+    text-align: left;
+}
+
+.sidebar .menu button:hover {
+    background-color: #34495e;
+}
+
+.header {
+    grid-area: header;
+    background-color: #34495e; /* Azul marino claro */
+    color: #ecf0f1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.header .user-info {
+    display: flex;
+    align-items: center;
+}
+
+.header .user-info span {
+    margin-right: 1rem;
+}
+
+.content {
+    grid-area: content;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.footer {
+    grid-area: footer;
+    background-color: #1a252f; /* Azul oscuro */
+    color: #ecf0f1;
+    text-align: center;
+    padding: 0rem 0;
+    font-size: 0.8rem;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .layout-admin {
+        grid-template-areas:
+            "header"
+            "content"
+            "footer";
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+    }
+
+    .sidebar {
+        display: none;
+    }
+
+    .header {
+        justify-content: center;
+    }
+}

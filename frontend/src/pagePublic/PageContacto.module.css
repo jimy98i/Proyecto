@@ -1,0 +1,76 @@
+.containerContacto {
+  background: #fff;
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.contactoCard {
+  background: #e8f5e9;
+  border-radius: 18px;
+  border: 1.5px solid #b2dfdb;
+  box-shadow: 0 2px 8px #b2dfdb;
+  padding: 2rem 1.5rem;
+}
+
+.mapaContacto {
+  width: 100%;
+  min-height: 220px;
+  border: 2px solid #b2dfdb;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px #e0e0e0;
+  margin-bottom: 10px;
+}
+
+.direccionMapa {
+  text-align: center;
+  color: #388e3c;
+  font-weight: bold;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.tituloContacto {
+  color: #00796b;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.datosContacto {
+  margin-bottom: 12px;
+}
+
+.datoTitulo {
+  font-weight: bold;
+  color: #388e3c;
+}
+
+.datoValor {
+  color: #00796b;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.datoValorCitas {
+  color: #388e3c;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.formContacto input,
+.formContacto textarea {
+  margin-bottom: 8px;
+}
+
+.botonEnviar {
+  background: #00796b;
+  border: none;
+  font-weight: bold;
+  width: 100%;
+}

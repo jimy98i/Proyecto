@@ -1,0 +1,61 @@
+/* Estilos para el componente Header */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+body {
+  background-image: url('./src/assets/fondo.jpg');
+  background-size: 100vw 100vh;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #e0f7fa; /* Azul claro */
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #00796b; /* Verde oscuro */
+}
+
+.menu {
+    display: flex;
+    gap: 15px;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #004d40; /* Verde más oscuro */
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.menu a:hover {
+    color: #00796b; /* Verde oscuro */
+}
+
+/* Estilos para ajustar el menú y el botón de login/logout */
+
+.header .menu {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-right: 10px; /* Espacio entre el menú y el botón de login/logout */
+}
+
+.header .login-button {
+    margin-left: 0; /* Elimina cualquier margen adicional para que esté pegado al menú */
+}
