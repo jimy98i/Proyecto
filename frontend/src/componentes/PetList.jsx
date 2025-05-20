@@ -1,23 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { get, post, put, del } from '../utils/api';
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-const PetList = ({ userId, onPetSelect }) => {
+const PetList = () => {
   const [pets, setPets] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedPet, setSelectedPet] = useState(null);
-  const [currentUserId, setCurrentUserId] = useState(userId);
-
   const [formData, setFormData] = useState({
     nombre: '',
-    tipo: '',
+    especie: '',
     raza: '',
     edad: '',
     peso: '',
-    fecha_nacimiento: '',
-    dueno_id: currentUserId
+    cliente_id: ''
   });
 
   useEffect(() => {
@@ -26,23 +21,12 @@ const PetList = ({ userId, onPetSelect }) => {
 
   const fetchPets = async () => {
     try {
-      const response = await fetch(`${API_URL}/pet/client/${localStorage.getItem('userName')}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
-      });
-
+      const response = await get(`/pet/client/${localStorage.getItem('userName')}`);
       if (!response.ok) {
-        throw new Error('Error al cargar las mascotas');
+        throw new Error('Error al obtener las mascotas');
       }
-
       const data = await response.json();
       setPets(data);
-      
-      if (data && data.length > 0) {
-        setCurrentUserId(data[0].dueno_id);
-      }
     } catch (error) {
       console.error('Error:', error);
     }
@@ -60,46 +44,21 @@ const PetList = ({ userId, onPetSelect }) => {
     e.preventDefault();
     try {
       const url = selectedPet 
-        ? `${API_URL}/pet/${selectedPet.id}`
-        : `${API_URL}/pet`;
+        ? `/pet/${selectedPet.id}`
+        : '/pet';
       
-      const method = selectedPet ? 'PUT' : 'POST';
-      
-      const petData = {
-        nombre: formData.nombre,
-        tipo: formData.tipo,
-        raza: formData.raza || null,
-        edad: parseInt(formData.edad),
-        peso: parseFloat(formData.peso),
-        fecha_nacimiento: formData.fecha_nacimiento,
-        dueno_id: currentUserId
-      };
-
-      console.log('FormData completo:', formData);
-      console.log('Datos a enviar:', petData);
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify(petData)
-      });
+      const method = selectedPet ? put : post;
+      const response = await method(url, formData);
 
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Error response:', errorData);
-        throw new Error(errorData.message || 'Error al guardar la mascota');
+        throw new Error('Error al guardar la mascota');
       }
 
       setShowModal(false);
       fetchPets();
       resetForm();
     } catch (error) {
-      console.error('Error completo:', error);
-      alert(error.message || 'Error al guardar la mascota');
+      console.error('Error:', error);
     }
   };
 
@@ -107,12 +66,11 @@ const PetList = ({ userId, onPetSelect }) => {
     setSelectedPet(pet);
     setFormData({
       nombre: pet.nombre,
-      tipo: pet.tipo,
+      especie: pet.especie,
       raza: pet.raza,
       edad: pet.edad,
       peso: pet.peso,
-      fecha_nacimiento: pet.fecha_nacimiento,
-      dueno_id: pet.dueno_id
+      cliente_id: pet.cliente_id
     });
     setShowModal(true);
   };
@@ -120,17 +78,10 @@ const PetList = ({ userId, onPetSelect }) => {
   const handleDelete = async (petId) => {
     if (window.confirm('¿Está seguro de que desea eliminar esta mascota?')) {
       try {
-        const response = await fetch(`${API_URL}/pet/${petId}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-          }
-        });
-
+        const response = await del(`/pet/${petId}`);
         if (!response.ok) {
           throw new Error('Error al eliminar la mascota');
         }
-
         fetchPets();
       } catch (error) {
         console.error('Error:', error);
@@ -139,39 +90,38 @@ const PetList = ({ userId, onPetSelect }) => {
   };
 
   const resetForm = () => {
-    setSelectedPet(null);
     setFormData({
       nombre: '',
-      tipo: '',
+      especie: '',
       raza: '',
       edad: '',
       peso: '',
-      fecha_nacimiento: '',
-      dueno_id: currentUserId
+      cliente_id: ''
     });
+    setSelectedPet(null);
   };
 
   return (
-    <div className="pet-list-container">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3>Mis Mascotas</h3>
-        <Button variant="primary" onClick={() => {
+    <div>
+      <Button 
+        variant="primary" 
+        onClick={() => {
           resetForm();
           setShowModal(true);
-        }}>
-          Añadir Mascota
-        </Button>
-      </div>
+        }}
+        className="mb-3"
+      >
+        Añadir Mascota
+      </Button>
 
       <Table striped bordered hover>
         <thead>
           <tr>
             <th>Nombre</th>
-            <th>Tipo</th>
+            <th>Especie</th>
             <th>Raza</th>
             <th>Edad</th>
             <th>Peso</th>
-            <th>Fecha de Nacimiento</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -179,26 +129,25 @@ const PetList = ({ userId, onPetSelect }) => {
           {pets.map(pet => (
             <tr key={pet.id}>
               <td>{pet.nombre}</td>
-              <td>{pet.tipo}</td>
+              <td>{pet.especie}</td>
               <td>{pet.raza}</td>
               <td>{pet.edad}</td>
-              <td>{pet.peso} kg</td>
-              <td>{new Date(pet.fecha_nacimiento).toLocaleDateString()}</td>
+              <td>{pet.peso}</td>
               <td>
                 <Button 
-                  variant="outline-primary" 
+                  variant="warning" 
                   size="sm" 
                   className="me-2"
                   onClick={() => handleEdit(pet)}
                 >
-                  <FaEdit />
+                  Editar
                 </Button>
                 <Button 
-                  variant="outline-danger" 
+                  variant="danger" 
                   size="sm"
                   onClick={() => handleDelete(pet.id)}
                 >
-                  <FaTrash />
+                  Eliminar
                 </Button>
               </td>
             </tr>
@@ -206,13 +155,10 @@ const PetList = ({ userId, onPetSelect }) => {
         </tbody>
       </Table>
 
-      <Modal show={showModal} onHide={() => {
-        setShowModal(false);
-        resetForm();
-      }}>
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>
-            {selectedPet ? 'Editar Mascota' : 'Añadir Nueva Mascota'}
+            {selectedPet ? 'Editar Mascota' : 'Añadir Mascota'}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -229,18 +175,14 @@ const PetList = ({ userId, onPetSelect }) => {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Tipo</Form.Label>
-              <Form.Select
-                name="tipo"
-                value={formData.tipo}
+              <Form.Label>Especie</Form.Label>
+              <Form.Control
+                type="text"
+                name="especie"
+                value={formData.especie}
                 onChange={handleInputChange}
                 required
-              >
-                <option value="">Seleccione un tipo</option>
-                <option value="perro">Perro</option>
-                <option value="gato">Gato</option>
-                <option value="otro">Otro</option>
-              </Form.Select>
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
@@ -250,6 +192,7 @@ const PetList = ({ userId, onPetSelect }) => {
                 name="raza"
                 value={formData.raza}
                 onChange={handleInputChange}
+                required
               />
             </Form.Group>
 
@@ -257,7 +200,6 @@ const PetList = ({ userId, onPetSelect }) => {
               <Form.Label>Edad</Form.Label>
               <Form.Control
                 type="number"
-                min="0"
                 name="edad"
                 value={formData.edad}
                 onChange={handleInputChange}
@@ -266,11 +208,9 @@ const PetList = ({ userId, onPetSelect }) => {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Peso (kg)</Form.Label>
+              <Form.Label>Peso</Form.Label>
               <Form.Control
                 type="number"
-                step="0.1"
-                min="0"
                 name="peso"
                 value={formData.peso}
                 onChange={handleInputChange}
@@ -278,28 +218,9 @@ const PetList = ({ userId, onPetSelect }) => {
               />
             </Form.Group>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Fecha de Nacimiento</Form.Label>
-              <Form.Control
-                type="date"
-                name="fecha_nacimiento"
-                value={formData.fecha_nacimiento}
-                onChange={handleInputChange}
-                required
-              />
-            </Form.Group>
-
-            <div className="d-flex justify-content-end">
-              <Button variant="secondary" className="me-2" onClick={() => {
-                setShowModal(false);
-                resetForm();
-              }}>
-                Cancelar
-              </Button>
-              <Button variant="primary" type="submit">
-                {selectedPet ? 'Guardar Cambios' : 'Añadir Mascota'}
-              </Button>
-            </div>
+            <Button variant="primary" type="submit">
+              {selectedPet ? 'Actualizar' : 'Guardar'}
+            </Button>
           </Form>
         </Modal.Body>
       </Modal>

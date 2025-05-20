@@ -7,6 +7,7 @@ import Citas from "../pages/Citas";
 import Empleados from "../pages/Empleados";
 import HistorialMedico from "../pages/HistorialMedico";
 import { useAuth } from "../auth/AuthContext";
+import NotificationBell from "../componentes/NotificationBell";
 
 const LayoutAdmin = () => {
     const [activeSection, setActiveSection] = useState("citas");
@@ -41,7 +42,8 @@ const LayoutAdmin = () => {
                 <Navbar.Brand className="ms-3">{activeSection.toUpperCase()}</Navbar.Brand>
                 <Navbar.Collapse className="justify-content-end">
                     <Navbar.Text className="me-3">{userName}</Navbar.Text>
-                    <Button variant="outline-light" onClick={logout}>
+                    <NotificationBell />
+                    <Button variant="outline-light" onClick={logout} className="ms-3">
                         Cerrar Sesión
                     </Button>
                 </Navbar.Collapse>

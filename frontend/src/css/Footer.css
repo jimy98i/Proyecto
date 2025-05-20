@@ -1,7 +1,7 @@
 /* Estilos para el Footer en el layout de administrador */
 .footer-admin {
     background-color: #34495e; /* Azul marino claro */
-    color: #ecf0f1; /* Texto claro */
+    color: #e4e4e4; /* Texto claro */
     text-align: center;
     padding: 0rem 0; /* Reducir el padding para hacer la barra más fina */
     font-size: 0.8rem; /* Reducir el tamaño de la fuente */

@@ -8,32 +8,62 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
-    console.log('Datos iniciales recibidos en el modal:', initialData);
     setFormData(initialData);
-    console.log('Estado del formulario después de actualizar:', formData);
   }, [initialData]);
 
   const checkAvailability = async (fecha_cita, hora_cita) => {
-    try {
+    try {      
+      // Primero obtenemos el token CSRF
+      const csrfResponse = await fetch(`${API_URL}/sanctum/csrf-cookie`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+        }
+      });
+
+      if (!csrfResponse.ok) {
+        throw new Error('Error al obtener el token CSRF');
+      }
+
+      // Obtener el token XSRF de las cookies
+      const xsrfToken = getCookie('XSRF-TOKEN');
+      console.log('Token XSRF obtenido:', xsrfToken);
+
       const response = await fetch(`${API_URL}/appointment/check-availability`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'X-XSRF-TOKEN': decodeURIComponent(xsrfToken)
         },
+        credentials: 'include',
         body: JSON.stringify({ fecha_cita, hora_cita })
       });
 
       if (!response.ok) {
-        throw new Error('Error al verificar la disponibilidad');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Error al verificar la disponibilidad');
       }
 
       const data = await response.json();
       return data.available;
     } catch (error) {
-      console.error('Error al verificar la disponibilidad:', error);
+      console.error('Error completo al verificar la disponibilidad:', error);
       return false;
     }
+  };
+
+  // Función auxiliar para obtener el valor de una cookie
+  const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      const token = parts.pop().split(';').shift();
+      return token;
+    }
+    return null;
   };
 
   const handleInputChange = (e) => {
@@ -46,6 +76,12 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
 
   const handleHoraCitaChange = async (e) => {
     const { value } = e.target;
+    
+    if (!formData.fecha_cita) {
+      alert('Por favor, seleccione primero una fecha');
+      return;
+    }
+
     const isAvailable = await checkAvailability(formData.fecha_cita, value);
     
     if (!isAvailable) {
@@ -174,12 +210,12 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
             )}
               <Form.Group className="mb-3" controlId="formNotas">
                 <Form.Label>Notas</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  name="notas"
-                  value={formData.notas || ''}
-                  onChange={handleInputChange}
-                  placeHolder='Proporciona una breve descriopción del problema que tiene tu mascota.'
+                <textarea
+                  className="form-control"
+                  placeholder='Proporciona una breve descriopción del problema que tiene tu mascota.'
+                  rows={3}
+                  value={formData.notas}
+                  onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
                 />
               </Form.Group>
             <div className="d-flex justify-content-between">

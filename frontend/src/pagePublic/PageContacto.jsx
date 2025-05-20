@@ -37,11 +37,11 @@ const PageContacto = () => (
               </div>
               <div style={{ marginBottom: 12 }}>
                 <div style={{ fontWeight: 'bold', color: '#388e3c' }}>Correo electrónico:</div>
-                <div><a href="mailto:info@veterinariagranada.com" style={{ color: '#00796b', textDecoration: 'none' }}>info@veterinariagranada.com</a></div>
+                <div><a href="mailto:info@veterinariagranada.com" style={{ color: '#00796b', textDecoration: 'none' }}>info@veterinariahappyfriends.com</a></div>
               </div>
               <div style={{ marginBottom: 20 }}>
                 <div style={{ fontWeight: 'bold', color: '#388e3c' }}>Dirección:</div>
-                <div>Calle Ejemplo 123, 18001 Granada</div>
+                <div>Calle Jacinto 2, 18001 Granada</div>
               </div>
               {/* Formulario de contacto */}
               <form>

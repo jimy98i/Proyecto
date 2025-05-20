@@ -18,6 +18,7 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Middleware\Authenticate;
 use App\Http\Controllers\TreatmentController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\StorageController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -41,6 +42,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user/{id}', [UserController::class, 'show'])->name('user.show');  // Obtener un usuario específico
     Route::put('/user/{user}', [UserController::class, 'update']); // Actualizar un usuario
     Route::delete('/user/{user}', [UserController::class, 'destroy']); // Eliminar un usuario
+    Route::post('/user/upload-photo', [UserController::class, 'uploadProfilePhoto'])->middleware(['web']);
 });
 
 
@@ -153,4 +155,11 @@ Route::get('/session-check', function (Request $request) {
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
     }
+});
+
+// Ruta para servir archivos estáticos
+Route::middleware(['api'])->group(function () {
+    Route::get('/storage/{path}', [StorageController::class, 'serve'])
+        ->where('path', '.*')
+        ->name('storage.serve');
 });
