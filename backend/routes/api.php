@@ -43,6 +43,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/user/{user}', [UserController::class, 'update']); // Actualizar un usuario
     Route::delete('/user/{user}', [UserController::class, 'destroy']); // Eliminar un usuario
     Route::post('/user/upload-photo', [UserController::class, 'uploadProfilePhoto'])->middleware(['web']);
+
+    // Rutas específicas para clientes
+    Route::get('/users/clients/{role}', [UserController::class, 'getByRole'])->name('user.clients');
 });
 
 
@@ -138,6 +141,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 // Rutas de autenticación
 Route::middleware(['api'])->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/register', [AuthController::class, 'register']);
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('/session-check', [AuthController::class, 'checkSession'])->name('session.check');

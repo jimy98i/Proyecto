@@ -62,7 +62,9 @@ class UserController extends Controller
 
     public function getByRole(string $role): JsonResponse
     {
+        Log::info('Buscando usuarios con rol: ' . $role);
         $users = $this->userService->getUsersByRole($role);
+        Log::info('Usuarios encontrados: ' . $users->count());
         return response()->json($users);
     }
 
