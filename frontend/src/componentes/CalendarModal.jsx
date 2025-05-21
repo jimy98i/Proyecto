@@ -4,11 +4,28 @@ import { Modal, Button, Form } from 'react-bootstrap';
 const API_URL = import.meta.env.VITE_API_URL;
 
 const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole, onDelete }) => {
-  const [formData, setFormData] = useState(initialData);
+  const [formData, setFormData] = useState({
+    id: '',
+    fecha_cita: '',
+    hora_cita: '',
+    tipo_cita: '',
+    estado: 'programada',
+    notas: ''
+  });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
-    setFormData(initialData);
+    if (initialData) {
+      // console.log('Datos iniciales recibidos:', initialData);
+      setFormData({
+        id: initialData.id || '',
+        fecha_cita: initialData.fecha_cita || '',
+        hora_cita: initialData.hora_cita || '',
+        tipo_cita: initialData.tipo_cita || initialData.title || '',
+        estado: initialData.estado || 'programada',
+        notas: initialData.notas || initialData.descripcion || ''
+      });
+    }
   }, [initialData]);
 
   const checkAvailability = async (fecha_cita, hora_cita) => {
@@ -28,7 +45,7 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
 
       // Obtener el token XSRF de las cookies
       const xsrfToken = getCookie('XSRF-TOKEN');
-      console.log('Token XSRF obtenido:', xsrfToken);
+      // console.log('Token XSRF obtenido:', xsrfToken);
 
       const response = await fetch(`${API_URL}/appointment/check-availability`, {
         method: 'POST',
@@ -68,7 +85,8 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
+    // console.log(`Cambiando ${name} a:`, value);
+    setFormData(prevData => ({
       ...prevData,
       [name]: value
     }));
@@ -97,6 +115,7 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // console.log('Enviando datos del formulario:', formData);
     onSubmit(formData);
   };
 

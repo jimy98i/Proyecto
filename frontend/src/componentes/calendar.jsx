@@ -54,15 +54,18 @@ export default class Calendar extends React.Component {
       if (events && events.length > 0) {
         const formattedEvents = events.map(event => ({
           id: event.id,
-          title: event.title,
+          title: event.title || event.tipo_cita || 'Sin título',
           start: event.start,
           end: event.end,
-          backgroundColor: getStatusColor(event.status),
-          borderColor: getStatusColor(event.status),
+          status: event.status || event.estado || 'programada',
+          backgroundColor: getStatusColor(event.status || event.estado),
+          borderColor: getStatusColor(event.status || event.estado),
           extendedProps: {
-            ...event
+            ...event,
+            status: event.status || event.estado || 'programada'
           }
         }));
+        // console.log('Eventos formateados:', formattedEvents);
         this.setState({ currentEvents: formattedEvents });
       }
     } catch (error) {
@@ -76,8 +79,8 @@ export default class Calendar extends React.Component {
     }
   }
 
-  openModal = (action, eventData = { id:'', linea_historial_id: '', fecha_cita: '', hora_cita: '', tipo_cita: '', estado: '', notas: '' }) => {
-    console.log('Abriendo modal con datos:', eventData); // Depurar los datos que se pasan al modal
+  openModal = (action, eventData = {}) => {
+    // console.log('Abriendo modal con datos:', eventData);
     this.setState({
       isModalOpen: true,
       modalData: eventData,
@@ -86,54 +89,55 @@ export default class Calendar extends React.Component {
   };
 
   closeModal = () => {
-    this.setState({ isModalOpen: false, modalAction: null });
+    this.setState({ 
+      isModalOpen: false, 
+      modalAction: null,
+      modalData: { title: '', start: '', end: '', allDay: false }
+    });
   };
 
   handleDateSelect = (selectInfo) => {
-    this.openModal('create', {
-      linea_historial_id: '',
-      fecha_cita: selectInfo.startStr.split('T')[0], // Extraer solo la fecha
-      hora_cita: '',
+    const eventData = {
+      fecha_cita: selectInfo.startStr.split('T')[0],
+      hora_cita: selectInfo.startStr.split('T')[1]?.substring(0, 5) || '',
       tipo_cita: '',
-      estado: 'programada', // Estado predeterminado
+      estado: 'programada',
       notas: ''
-    });
+    };
+    // console.log('Datos para nueva cita:', eventData);
+    this.openModal('create', eventData);
   };
 
   handleEventClick = (info) => {
-    const eventData = info.event.extendedProps;
-    this.setState({
-      showModal: true,
-      selectedEvent: eventData
-    });
+    const eventData = {
+      id: info.event.id,
+      title: info.event.title,
+      fecha_cita: info.event.startStr.split('T')[0],
+      hora_cita: info.event.startStr.split('T')[1]?.substring(0, 5) || '',
+      tipo_cita: info.event.extendedProps.tipo_cita || info.event.title || '',
+      estado: info.event.extendedProps.status || info.event.extendedProps.estado || 'programada',
+      notas: info.event.extendedProps.notas || info.event.extendedProps.descripcion || ''
+    };
+    // console.log('Datos del evento para el modal:', eventData);
+    this.openModal('edit', eventData);
   };
 
   handleModalSubmit = async (formData) => {
-    const { modalAction } = this.state;
-    const calendarApi = this.calendarRef.current.getApi();
-    console.log('Datos del formulario:', formData);
-
     try {
-      if (modalAction === 'create') {
+      if (this.state.modalAction === 'create') {
         const response = await post('/appointment', formData);
         if (!response.ok) {
           throw new Error('Error al añadir el evento');
         }
-        const savedEvent = await response.json();
-        calendarApi.addEvent({
-          id: savedEvent.id,
-          ...formData
-        });
-        this.closeModal();
-        this.loadEvents();
-      } else if (modalAction === 'edit') {
+        await this.loadEvents();
+      } else if (this.state.modalAction === 'edit') {
         const response = await put(`/appointment/${formData.id}`, formData);
         if (!response.ok) {
           throw new Error('Error al actualizar el evento');
         }
-        this.closeModal();
-        this.loadEvents();
+        await this.loadEvents();
       }
+      this.closeModal();
     } catch (error) {
       console.error('Error en la operación:', error);
     }
@@ -145,14 +149,7 @@ export default class Calendar extends React.Component {
       if (!response.ok) {
         throw new Error('Error al eliminar la cita');
       }
-
-      const calendarApi = this.calendarRef.current.getApi();
-      const event = calendarApi.getEventById(appointmentId);
-      if (event) {
-        event.remove();
-      }
-      
-      this.loadEvents();
+      await this.loadEvents();
     } catch (error) {
       console.error('Error al eliminar la cita:', error);
       throw error;
@@ -193,7 +190,6 @@ export default class Calendar extends React.Component {
                 events={this.state.currentEvents}
                 select={this.handleDateSelect}
                 eventClick={this.handleEventClick}
-                eventsSet={this.handleEvents}
                 eventChange={this.handleEventChange}
                 eventDisplay="block"
                 eventTimeFormat={{
@@ -244,20 +240,24 @@ export default class Calendar extends React.Component {
             </button>
           </div>
           <ul>
-            {this.state.currentEvents.map(event => (
-              <li key={event.id} className="mb-2">
-                <div className="d-flex justify-content-between align-items-center">
-                  <div>
-                    <b>{formatDate(event.start, { month: '2-digit', day: '2-digit', year: 'numeric' })}</b>
-                    <br />
-                    <i>{event.title}</i>
+            {this.state.currentEvents.map(event => {
+              const status = event.status || event.extendedProps?.status || 'programada';
+              // console.log('Renderizando evento:', { id: event.id, title: event.title, status });
+              return (
+                <li key={event.id} className="mb-2">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                      <b>{formatDate(event.start, { month: '2-digit', day: '2-digit', year: 'numeric' })}</b>
+                      <br />
+                      <i>{event.title}</i>
+                    </div>
+                    <Badge bg={getStatusColor(status)}>
+                      {status}
+                    </Badge>
                   </div>
-                  <Badge bg={getStatusColor(event.status)}>
-                    {event.status}
-                  </Badge>
-                </div>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>
@@ -275,6 +275,7 @@ export default class Calendar extends React.Component {
       id: changeInfo.event.id,
       title: changeInfo.event.title,
       start: changeInfo.event.startStr,
+      end: changeInfo.event.endStr,
       allDay: changeInfo.event.allDay
     };
 
@@ -283,20 +284,9 @@ export default class Calendar extends React.Component {
       if (!response.ok) {
         throw new Error('Error al actualizar el evento');
       }
-      this.loadEvents();
+      await this.loadEvents();
     } catch (error) {
       console.error('Error al actualizar el evento:', error);
-    }
-  };
-
-  handleEvents = (events) => {
-    // Comparar los eventos actuales y nuevos de manera más segura
-    const currentEventIds = this.state.currentEvents.map(event => event.id);
-    const newEventIds = events.map(event => event.id);
-
-    // Solo actualizar el estado si los eventos han cambiado
-    if (currentEventIds.join(',') !== newEventIds.join(',')) {
-      this.setState({ currentEvents: events });
     }
   };
 
