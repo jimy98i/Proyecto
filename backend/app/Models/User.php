@@ -14,6 +14,20 @@ class User extends Authenticatable
     use HasFactory, Notifiable, HasApiTokens;
 
     /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'users';
+
+    /**
+     * The database connection that should be used by the model.
+     *
+     * @var string
+     */
+    protected $connection = 'mysql';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -25,6 +39,7 @@ class User extends Authenticatable
         'telefono',
         'direccion',
         'rol',
+        'foto',
     ];
 
     /**

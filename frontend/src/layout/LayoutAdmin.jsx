@@ -6,7 +6,9 @@ import Consultas from "../pages/Consultas";
 import Citas from "../pages/Citas";
 import Empleados from "../pages/Empleados";
 import HistorialMedico from "../pages/HistorialMedico";
+import ClientManagement from "../componentes/ClientManagement";
 import { useAuth } from "../auth/AuthContext";
+import NotificationBell from "../componentes/NotificationBell";
 
 const LayoutAdmin = () => {
     const [activeSection, setActiveSection] = useState("citas");
@@ -23,6 +25,8 @@ const LayoutAdmin = () => {
                 return <Empleados />;
             case "historial-medico":
                 return <HistorialMedico />;
+            case "clientes":
+                return <ClientManagement />;
             default:
                 return <Citas />;
         }
@@ -41,7 +45,8 @@ const LayoutAdmin = () => {
                 <Navbar.Brand className="ms-3">{activeSection.toUpperCase()}</Navbar.Brand>
                 <Navbar.Collapse className="justify-content-end">
                     <Navbar.Text className="me-3">{userName}</Navbar.Text>
-                    <Button variant="outline-light" onClick={logout}>
+                    <NotificationBell />
+                    <Button variant="outline-light" onClick={logout} className="ms-3">
                         Cerrar Sesión
                     </Button>
                 </Navbar.Collapse>
@@ -55,6 +60,7 @@ const LayoutAdmin = () => {
                     <Nav className="flex-column">
                         <Nav.Link onClick={() => { setActiveSection("consultas"); setShowSidebar(false); }}>CONSULTAS</Nav.Link>
                         <Nav.Link onClick={() => { setActiveSection("citas"); setShowSidebar(false); }}>CITAS</Nav.Link>
+                        <Nav.Link onClick={() => { setActiveSection("clientes"); setShowSidebar(false); }}>CLIENTES</Nav.Link>
                         <Nav.Link onClick={() => { setActiveSection("empleados"); setShowSidebar(false); }}>EMPLEADOS</Nav.Link>
                         <Nav.Link onClick={() => { setActiveSection("historial-medico"); setShowSidebar(false); }}>HISTORIAL MÉDICO</Nav.Link>
                     </Nav>
@@ -68,6 +74,7 @@ const LayoutAdmin = () => {
                 <Nav className="flex-column">
                     <Nav.Link onClick={() => setActiveSection("consultas")}>CONSULTAS</Nav.Link>
                     <Nav.Link onClick={() => setActiveSection("citas")}>CITAS</Nav.Link>
+                    <Nav.Link onClick={() => setActiveSection("clientes")}>CLIENTES</Nav.Link>
                     <Nav.Link onClick={() => setActiveSection("empleados")}>EMPLEADOS</Nav.Link>
                     <Nav.Link onClick={() => setActiveSection("historial-medico")}>HISTORIAL MÉDICO</Nav.Link>
                 </Nav>

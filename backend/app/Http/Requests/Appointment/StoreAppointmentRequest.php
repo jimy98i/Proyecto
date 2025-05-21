@@ -32,6 +32,9 @@ class StoreAppointmentRequest extends FormRequest
             'fecha_cita.after_or_equal' => 'La fecha de la cita no puede ser anterior a hoy',
             'hora_cita.required' => 'La hora de la cita es obligatoria',
             'hora_cita.date_format' => 'La hora de la cita debe tener el formato HH:mm',
+            'tipo_cita.in' => 'El tipo de cita debe ser uno de: consulta, revisión, urgencia, vacunación, operación',
+            'estado.in' => 'El estado debe ser uno de: programada, confirmada, cancelada, completada',
+            'notas.required' => 'Las notas son obligatorias'
         ];
     }
 }

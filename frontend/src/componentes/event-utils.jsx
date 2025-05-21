@@ -1,23 +1,171 @@
-const API_URL = import.meta.env.VITE_API_URL;
+import { get } from '../utils/api';
 
-export async function fetchAppointments() {
+export const fetchAppointments = async () => {
     try {
-        const response = await fetch(`${API_URL}/appointment`);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
+        const response = await get('/appointment');
+        
+        // Obtener el JSON de la respuesta
+        const appointments = await response.json();
 
-        // Procesar los datos para evitar referencias circulares
+        // Asegurarnos de que appointments es un array
+        if (!Array.isArray(appointments)) {
+            console.error('La respuesta no es un array:', appointments);
+            return [];
+        }
+
+        const mappedAppointments = appointments.map(appointment => {
+            const event = {
+                id: appointment.id,
+                title: appointment.title || 'Pendiente',
+                start: `${appointment.start}`,
+                end: null,
+                allDay: false,
+                status: appointment.status,
+                notas: appointment.notas,
+                cliente: appointment.cliente,
+                historial: appointment.historial
+            };
+            return event;
+        });
+
+        return mappedAppointments;
+    } catch (error) {
+        return [];
+    }
+};
+
+export const fetchUpcomingAppointments = async () => {
+    try {
+        const response = await get('/appointment/upcoming');
+        const data = response.data;
+        
         return data.map(appointment => ({
             id: appointment.id,
             title: appointment.title || 'Sin título',
             start: appointment.start,
-            end: appointment.end || null,
-            allDay: appointment.allDay || false
+            end: appointment.start,
+            allDay: false,
+            status: appointment.status,
+            notas: appointment.notas,
+            ...(appointment.cliente && {
+                cliente: {
+                    id: appointment.cliente.id,
+                    nombre: appointment.cliente.nombre,
+                    email: appointment.cliente.email
+                }
+            }),
+            ...(appointment.historial && {
+                historial: {
+                    id: appointment.historial.id,
+                    descripcion: appointment.historial.descripcion,
+                    fecha: appointment.historial.fecha,
+                    mascota: appointment.historial.mascota
+                }
+            })
         }));
     } catch (error) {
-        console.error('Error fetching appointments:', error);
         return [];
     }
-}
+};
+
+export const fetchPastAppointments = async () => {
+    try {
+        const response = await get('/appointment/past');
+        const data = response.data;
+        
+        return data.map(appointment => ({
+            id: appointment.id,
+            title: appointment.title || 'Sin título',
+            start: appointment.start,
+            end: appointment.start,
+            allDay: false,
+            status: appointment.status,
+            notas: appointment.notas,
+            ...(appointment.cliente && {
+                cliente: {
+                    id: appointment.cliente.id,
+                    nombre: appointment.cliente.nombre,
+                    email: appointment.cliente.email
+                }
+            }),
+            ...(appointment.historial && {
+                historial: {
+                    id: appointment.historial.id,
+                    descripcion: appointment.historial.descripcion,
+                    fecha: appointment.historial.fecha,
+                    mascota: appointment.historial.mascota
+                }
+            })
+        }));
+    } catch (error) {
+        return [];
+    }
+};
+
+export const fetchAppointmentsByStatus = async (status) => {
+    try {
+        const response = await get(`/appointment/status/${status}`);
+        const data = response.data;
+        
+        return data.map(appointment => ({
+            id: appointment.id,
+            title: appointment.title || 'Sin título',
+            start: appointment.start,
+            end: null,
+            allDay: false,
+            status: appointment.status,
+            notas: appointment.notas,
+            ...(appointment.cliente && {
+                cliente: {
+                    id: appointment.cliente.id,
+                    nombre: appointment.cliente.nombre,
+                    email: appointment.cliente.email
+                }
+            }),
+            ...(appointment.historial && {
+                historial: {
+                    id: appointment.historial.id,
+                    descripcion: appointment.historial.descripcion,
+                    fecha: appointment.historial.fecha,
+                    mascota: appointment.historial.mascota
+                }
+            })
+        }));
+    } catch (error) {
+        return [];
+    }
+};
+
+export const fetchAppointmentsByType = async (type) => {
+    try {
+        const response = await get(`/appointment/type/${type}`);
+        const data = response.data;
+  
+        return data.map(appointment => ({
+            id: appointment.id,
+            title: appointment.title || 'Sin título',
+            start: appointment.start,
+            end: appointment.start,
+            allDay: false,
+            status: appointment.status,
+            notas: appointment.notas,
+            ...(appointment.cliente && {
+                cliente: {
+                    id: appointment.cliente.id,
+                    nombre: appointment.cliente.nombre,
+                    email: appointment.cliente.email
+                }
+            }),
+            ...(appointment.historial && {
+                historial: {
+                    id: appointment.historial.id,
+                    descripcion: appointment.historial.descripcion,
+                    fecha: appointment.historial.fecha,
+                    mascota: appointment.historial.mascota
+                }
+            })
+        }));
+    } catch (error) {
+        return [];
+    }
+};

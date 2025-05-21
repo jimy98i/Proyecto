@@ -35,19 +35,20 @@ const Citas = () => {
     return (
         <div className="citas-section">
             <h1>Gestión de Citas</h1>
-            <p>Aquí puedes gestionar tus citas y ver el calendario de disponibilidad.</p>
             
-            {userRole === 'admin' && (
-                <div className="export-buttons">
-                    <Button variant="success" className="me-2">
-                        <FaFileExcel /> Exportar a Excel
-                    </Button>
-                    <Button variant="danger" className="me-2">
-                        <FaFilePdf /> Exportar a PDF
-                    </Button>
-                    <Button variant="primary">
-                        <FaFileCsv /> Exportar a CSV
-                    </Button>
+            {userRole === 'admin' ? (
+                <div className="admin-info">
+                    <p>Panel de administración de citas.</p>
+                </div>
+            ) : (
+                <div className="client-info">
+                    <p>Bienvenido a tu panel de citas. Aquí puedes:</p>
+                    <ul>
+                        <li>Ver tus citas programadas</li>
+                        <li>Solicitar nuevas citas</li>
+                        <li>Modificar o cancelar citas existentes</li>
+                        <li>Ver el historial de tus citas</li>
+                    </ul>
                 </div>
             )}
 

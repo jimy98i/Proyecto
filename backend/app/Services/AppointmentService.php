@@ -5,22 +5,124 @@ namespace App\Services;
 use App\Models\Appointment;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 
 class AppointmentService
 {
     public function getAll(): Collection
     {
-        return Appointment::with('historyLine')->get();
+        return Appointment::with([
+            'user:id,nombre,email',
+            'historyLine.history.pet:id,nombre,tipo'
+        ])->get();
     }
 
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getClientAppointments(): Collection
     {
-        return Appointment::with('historyLine')->paginate($perPage);
+        $userId = Auth::id();
+        
+        return Appointment::where('user_id', $userId)
+            ->select([
+                'id',
+                'tipo_cita',
+                'fecha_cita',
+                'hora_cita',
+                'estado',
+                'notas'
+            ])
+            ->get();
+    }
+
+    public function getClientUpcomingAppointments(): Collection
+    {
+        $userId = Auth::id();
+        
+        return Appointment::where('user_id', $userId)
+            ->where('fecha_cita', '>=', now())
+            ->where('estado', '!=', 'cancelada')
+            ->select([
+                'id',
+                'tipo_cita',
+                'fecha_cita',
+                'hora_cita',
+                'estado',
+                'notas'
+            ])
+            ->orderBy('fecha_cita')
+            ->orderBy('hora_cita')
+            ->get();
+    }
+
+    public function getClientPastAppointments(): Collection
+    {
+        $userId = Auth::id();
+        
+        return Appointment::where('user_id', $userId)
+            ->where('fecha_cita', '<', now())
+            ->select([
+                'id',
+                'tipo_cita',
+                'fecha_cita',
+                'hora_cita',
+                'estado',
+                'notas'
+            ])
+            ->orderBy('fecha_cita', 'desc')
+            ->orderBy('hora_cita', 'desc')
+            ->get();
+    }
+
+    public function getUpcomingAppointments(): Collection
+    {
+        return Appointment::where('fecha_cita', '>=', now())
+            ->where('estado', '!=', 'cancelada')
+            ->with([
+                'user:id,nombre,email',
+                'historyLine.history.pet:id,nombre,tipo'
+            ])
+            ->orderBy('fecha_cita')
+            ->orderBy('hora_cita')
+            ->get();
+    }
+
+    public function getPastAppointments(): Collection
+    {
+        return Appointment::where('fecha_cita', '<', now())
+            ->with([
+                'user:id,nombre,email',
+                'historyLine.history.pet:id,nombre,tipo'
+            ])
+            ->orderBy('fecha_cita', 'desc')
+            ->orderBy('hora_cita', 'desc')
+            ->get();
+    }
+
+    public function getAppointmentsByStatus(string $status): Collection
+    {
+        return Appointment::where('estado', $status)
+            ->with([
+                'user:id,nombre,email',
+                'historyLine.history.pet:id,nombre,tipo'
+            ])
+            ->get();
+    }
+
+    public function getAppointmentsByType(string $type): Collection
+    {
+        return Appointment::where('tipo_cita', $type)
+            ->with([
+                'user:id,nombre,email',
+                'historyLine.history.pet:id,nombre,tipo'
+            ])
+            ->get();
     }
 
     public function findById(int $id): ?Appointment
     {
-        return Appointment::with('historyLine')->find($id);
+        return Appointment::with([
+            'user:id,nombre,email',
+            'historyLine.history.pet:id,nombre,tipo'
+        ])->find($id);
     }
 
     public function create(array $data): Appointment
@@ -31,7 +133,6 @@ class AppointmentService
 
     public function update(Appointment $appointment, array $data): bool
     {
-        // dd($appointment, $data);
         $this->validateHistoryLine($data);
         return $appointment->update($data);
     }
@@ -44,40 +145,10 @@ class AppointmentService
     public function getAppointmentsByHistoryLine(int $historyLineId): Collection
     {
         return Appointment::where('linea_historial_id', $historyLineId)
-            ->with('historyLine')
-            ->get();
-    }
-
-    public function getUpcomingAppointments(): Collection
-    {
-        return Appointment::where('fecha_cita', '>=', now())
-            ->where('estado', '!=', 'cancelada')
-            ->with('historyLine')
-            ->orderBy('fecha_cita')
-            ->orderBy('hora_cita')
-            ->get();
-    }
-
-    public function getPastAppointments(): Collection
-    {
-        return Appointment::where('fecha_cita', '<', now())
-            ->with('historyLine')
-            ->orderBy('fecha_cita', 'desc')
-            ->orderBy('hora_cita', 'desc')
-            ->get();
-    }
-
-    public function getAppointmentsByStatus(string $status): Collection
-    {
-        return Appointment::where('estado', $status)
-            ->with('historyLine')
-            ->get();
-    }
-
-    public function getAppointmentsByType(string $type): Collection
-    {
-        return Appointment::where('tipo_cita', $type)
-            ->with('historyLine')
+            ->with([
+                'user:id,nombre,email',
+                'historyLine.history.pet:id,nombre,tipo'
+            ])
             ->get();
     }
 
