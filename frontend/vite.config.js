@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
   ],
+  base: '/',
   build: {
     outDir: '../public/build', // Este es el directorio de salida que se copiará en la carpeta public de Laravel
     emptyOutDir: true, // Vaciar la carpeta build antes de crear nuevos archivos
