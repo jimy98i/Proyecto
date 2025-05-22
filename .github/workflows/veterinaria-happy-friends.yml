@@ -81,13 +81,22 @@ jobs:
           # Construir el backend (Laravel)
           cd ../backend
           docker-compose run --rm backend composer install --no-dev --optimize-autoloader
+          
+          # Configurar Laravel para producción
+          docker-compose run --rm backend php artisan key:generate --force
+          
+          # Deshabilitar Xdebug en producción
+          docker-compose run --rm backend sh -c 'echo "xdebug.mode=off" >> /usr/local/etc/php/conf.d/xdebug.ini'
+          
+          # Ejecutar migraciones y seeders
+          docker-compose run --rm backend php artisan migrate --force
+          docker-compose run --rm backend php artisan db:seed --force
+          
+          # Limpiar y cachear
           docker-compose run --rm backend php artisan config:clear
           docker-compose run --rm backend php artisan route:clear
           docker-compose run --rm backend php artisan view:clear
           docker-compose run --rm backend php artisan cache:clear
-          
-          # Configurar Laravel para producción
-          docker-compose run --rm backend php artisan key:generate --force
           docker-compose run --rm backend php artisan config:cache
           docker-compose run --rm backend php artisan route:cache
           docker-compose run --rm backend php artisan view:cache
