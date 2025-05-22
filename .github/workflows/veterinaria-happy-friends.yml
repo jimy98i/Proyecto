@@ -39,52 +39,8 @@ jobs:
           cd frontend
           docker-compose run --rm frontend npm install
           
-          # Instalar sharp localmente y optimizar imágenes
-          docker-compose run --rm frontend npm install sharp
-          docker-compose run --rm frontend node -e "
-            const sharp = require('sharp');
-            const fs = require('fs');
-            const path = require('path');
-            
-            const optimizeImage = async (inputPath, outputPath) => {
-              try {
-                await sharp(inputPath)
-                  .jpeg({ quality: 80 })
-                  .toFile(outputPath);
-                console.log('Optimized:', inputPath);
-              } catch (error) {
-                console.error('Error optimizing:', inputPath, error);
-              }
-            };
-            
-            const processDirectory = async (dir) => {
-              const outputDir = dir.replace('assets', 'assets/optimized');
-              if (!fs.existsSync(outputDir)) {
-                fs.mkdirSync(outputDir, { recursive: true });
-              }
-              
-              const files = fs.readdirSync(dir);
-              for (const file of files) {
-                if (file.endsWith('.jpg')) {
-                  const inputPath = path.join(dir, file);
-                  const outputPath = path.join(outputDir, file);
-                  await optimizeImage(inputPath, outputPath);
-                }
-              }
-            };
-            
-            const directories = [
-              'src/assets/carrousel',
-              'src/assets/fondo',
-              'src/assets/personal',
-              'src/assets/salas',
-              'src/assets/servicios'
-            ];
-            
-            Promise.all(directories.map(processDirectory))
-              .then(() => console.log('All images optimized'))
-              .catch(console.error);
-          "
+          # Intentar arreglar vulnerabilidades
+          docker-compose run --rm frontend npm audit fix --force
           
           # Configurar Vite para producción
           echo 'export default {
