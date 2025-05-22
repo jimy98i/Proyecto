@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build-and-test:
+  build-produccion:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -31,11 +31,37 @@ jobs:
           # Construir el frontend (React + Vite)
           cd frontend
           docker-compose run --rm frontend npm install
+          
+          # Optimizar imágenes
+          docker-compose run --rm frontend npm install -g sharp-cli
+          docker-compose run --rm frontend sh -c '
+            mkdir -p src/assets/optimized
+            sharp -i src/assets/carrousel/*.jpg -o src/assets/optimized/carrousel/ --quality 80
+            sharp -i src/assets/fondo/*.jpg -o src/assets/optimized/fondo/ --quality 80
+            sharp -i src/assets/personal/*.jpg -o src/assets/optimized/personal/ --quality 80
+            sharp -i src/assets/salas/*.jpg -o src/assets/optimized/salas/ --quality 80
+            sharp -i src/assets/servicios/*.jpg -o src/assets/optimized/servicios/ --quality 80
+          '
+          
+          # Configurar Vite para producción
+          echo 'export default {
+            build: {
+              chunkSizeWarningLimit: 16000,
+              rollupOptions: {
+                output: {
+                  manualChunks: {
+                    vendor: ["react", "react-dom"],
+                    images: ["*.jpg", "*.png", "*.gif"]
+                  }
+                }
+              }
+            }
+          }' > vite.config.js
           docker-compose run --rm frontend npm run build
           
           # Mover el build de Vite a la carpeta correcta de Nginx
           mkdir -p ../backend/public/frontend
-          cp -r dist/* ../backend/public/frontend/
+          cp -r build/* ../backend/public/frontend/
           
           # Construir el backend (Laravel)
           cd ../backend
