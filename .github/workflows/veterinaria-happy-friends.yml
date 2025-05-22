@@ -105,13 +105,22 @@ jobs:
           docker-compose run --rm backend php artisan view:clear
           docker-compose run --rm backend php artisan cache:clear
           
-          # Eliminar rutas duplicadas y cachear
-          docker-compose run --rm backend php artisan route:list | grep storage.serve || true
-          docker-compose run --rm backend php artisan route:clear
-          
-          # Asegurarse de que no hay rutas duplicadas antes de cachear
-          docker-compose run --rm backend php artisan route:list --except-vendor | grep storage.serve || true
-          docker-compose run --rm backend php artisan route:cache
+          # Resolver conflicto de rutas duplicadas
+          docker-compose run --rm backend sh -c '
+            # Listar todas las rutas para identificar el conflicto
+            php artisan route:list --except-vendor
+            
+            # Eliminar la ruta duplicada de la API
+            php artisan route:clear
+            
+            # Modificar el archivo de rutas de la API si existe
+            if [ -f "routes/api.php" ]; then
+              sed -i "s/Route::get(\"storage\/{path}\", \[StorageController::class, \"serve\"\])->name(\"storage.serve\");/Route::get(\"storage\/{path}\", \[StorageController::class, \"serve\"\])->name(\"api.storage.serve\");/" routes/api.php
+            fi
+            
+            # Cachear las rutas después de la modificación
+            php artisan route:cache
+          '
           
           # Cachear el resto
           docker-compose run --rm backend php artisan config:cache
