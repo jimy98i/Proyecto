@@ -124,10 +124,39 @@ jobs:
 
       - name: Deploy to Production
         if: github.ref == 'refs/heads/main'
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
           echo "Deploying to production..."
-          # Aquí puedes agregar los comandos para desplegar en tu servidor de producción
-          # Por ejemplo:
-          # - Copiar los archivos necesarios
-          # - Ejecutar docker-compose en el servidor de producción
+          
+          # Configurar SSH
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          
+          # Añadir el host a known_hosts
+          ssh-keyscan -H $DEPLOY_HOST >> ~/.ssh/known_hosts
+          
+          # Crear archivo .env en el servidor si no existe
+          ssh -i ~/.ssh/deploy_key $DEPLOY_USER@$DEPLOY_HOST "mkdir -p $DEPLOY_PATH"
+          
+          # Copiar archivos al servidor
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            --exclude '.git' \
+            --exclude 'node_modules' \
+            --exclude 'vendor' \
+            ./ $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/
+          
+          # Ejecutar comandos en el servidor
+          ssh -i ~/.ssh/deploy_key $DEPLOY_USER@$DEPLOY_HOST "cd $DEPLOY_PATH && \
+            docker-compose down && \
+            docker-compose build --no-cache && \
+            docker-compose up -d"
+          
+          # Limpiar
+          rm -f ~/.ssh/deploy_key
       
