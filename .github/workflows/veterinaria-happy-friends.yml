@@ -87,42 +87,23 @@ jobs:
           
           # Deshabilitar Xdebug en producción
           docker-compose run --rm backend sh -c '
-            echo "xdebug.mode=off" > /usr/local/etc/php/conf.d/xdebug.ini
-            echo "xdebug.start_with_request=no" >> /usr/local/etc/php/conf.d/xdebug.ini
-            echo "xdebug.client_host=127.0.0.1" >> /usr/local/etc/php/conf.d/xdebug.ini
-            echo "xdebug.client_port=9003" >> /usr/local/etc/php/conf.d/xdebug.ini
-            echo "xdebug.discover_client_host=0" >> /usr/local/etc/php/conf.d/xdebug.ini
+            # Deshabilitar completamente Xdebug
+            rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+            rm -f /usr/local/etc/php/conf.d/xdebug.ini
           '
           
           # Ejecutar migraciones y seeders
           docker-compose run --rm backend php artisan migrate --force
           docker-compose run --rm backend php artisan db:seed --force
           
-          # Limpiar todo antes de cachear
+          # Limpiar todo antes de optimizar
           docker-compose run --rm backend php artisan optimize:clear
           docker-compose run --rm backend php artisan config:clear
           docker-compose run --rm backend php artisan route:clear
           docker-compose run --rm backend php artisan view:clear
           docker-compose run --rm backend php artisan cache:clear
           
-          # Resolver conflicto de rutas duplicadas
-          docker-compose run --rm backend sh -c '
-            # Listar todas las rutas para identificar el conflicto
-            php artisan route:list --except-vendor
-            
-            # Eliminar la ruta duplicada de la API
-            php artisan route:clear
-            
-            # Modificar el archivo de rutas de la API si existe
-            if [ -f "routes/api.php" ]; then
-              sed -i "s/Route::get(\"storage\/{path}\", \[StorageController::class, \"serve\"\])->name(\"storage.serve\");/Route::get(\"storage\/{path}\", \[StorageController::class, \"serve\"\])->name(\"api.storage.serve\");/" routes/api.php
-            fi
-            
-            # Cachear las rutas después de la modificación
-            php artisan route:cache
-          '
-          
-          # Cachear el resto
+          # Optimizar la aplicación sin cachear rutas
           docker-compose run --rm backend php artisan config:cache
           docker-compose run --rm backend php artisan view:cache
           docker-compose run --rm backend php artisan storage:link
