@@ -21,33 +21,35 @@ jobs:
       - name: Install Docker Compose
         run: |
           sudo apt-get update
-          sudo apt-get install -y docker-compose-plugin
-          docker compose version
+          sudo apt-get install -y curl
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
 
       - name: Build with Docker Compose
         run: |
           # Construir el frontend (React + Vite)
           cd frontend
-          docker compose run --rm frontend npm install
-          docker compose run --rm frontend npm run build
+          docker-compose run --rm frontend npm install
+          docker-compose run --rm frontend npm run build
           
           # Construir el backend (Laravel)
           cd ../backend
-          docker compose run --rm backend composer install --no-dev --optimize-autoloader
-          docker compose run --rm backend php artisan config:cache
-          docker compose run --rm backend php artisan route:cache
-          docker compose run --rm backend php artisan view:cache
+          docker-compose run --rm backend composer install --no-dev --optimize-autoloader
+          docker-compose run --rm backend php artisan config:cache
+          docker-compose run --rm backend php artisan route:cache
+          docker-compose run --rm backend php artisan view:cache
           
           # Volver al directorio raíz y construir los contenedores
           cd ..
-          docker compose build
-          docker compose up -d
+          docker-compose build
+          docker-compose up -d
           
           # Esperar a que los servicios estén listos
           sleep 30
           
           # Verificar que los contenedores están corriendo
-          docker compose ps
+          docker-compose ps
           
           # Verificar que Nginx está sirviendo correctamente
           curl -I http://localhost:80
