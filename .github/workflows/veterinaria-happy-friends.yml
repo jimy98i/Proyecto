@@ -48,12 +48,25 @@ jobs:
               chunkSizeWarningLimit: 16000,
               rollupOptions: {
                 output: {
-                  manualChunks: {
-                    "react-vendor": ["react", "react-dom", "react-router-dom"],
-                    "ui-vendor": ["@mui/material", "@mui/icons-material", "@emotion/react", "@emotion/styled"],
-                    "utils-vendor": ["html2canvas", "dompurify"],
-                    "styles": ["*.css", "*.scss"],
-                    "images": ["*.jpg", "*.png", "*.gif", "*.webp"]
+                  manualChunks: (id) => {
+                    if (id.includes("node_modules")) {
+                      if (id.includes("@mui")) {
+                        return "mui-vendor";
+                      }
+                      if (id.includes("react") || id.includes("react-dom")) {
+                        return "react-vendor";
+                      }
+                      if (id.includes("html2canvas") || id.includes("dompurify")) {
+                        return "utils-vendor";
+                      }
+                      return "vendor";
+                    }
+                    if (id.includes(".css") || id.includes(".scss")) {
+                      return "styles";
+                    }
+                    if (id.includes(".jpg") || id.includes(".png") || id.includes(".gif") || id.includes(".webp")) {
+                      return "images";
+                    }
                   }
                 }
               }
