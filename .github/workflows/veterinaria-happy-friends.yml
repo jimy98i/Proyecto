@@ -86,19 +86,31 @@ jobs:
           docker-compose run --rm backend php artisan key:generate --force
           
           # Deshabilitar Xdebug en producción
-          docker-compose run --rm backend sh -c 'echo "xdebug.mode=off" >> /usr/local/etc/php/conf.d/xdebug.ini'
+          docker-compose run --rm backend sh -c '
+            echo "xdebug.mode=off" > /usr/local/etc/php/conf.d/xdebug.ini
+            echo "xdebug.start_with_request=no" >> /usr/local/etc/php/conf.d/xdebug.ini
+            echo "xdebug.client_host=127.0.0.1" >> /usr/local/etc/php/conf.d/xdebug.ini
+            echo "xdebug.client_port=9003" >> /usr/local/etc/php/conf.d/xdebug.ini
+          '
           
           # Ejecutar migraciones y seeders
           docker-compose run --rm backend php artisan migrate --force
           docker-compose run --rm backend php artisan db:seed --force
           
-          # Limpiar y cachear
+          # Limpiar todo antes de cachear
+          docker-compose run --rm backend php artisan optimize:clear
           docker-compose run --rm backend php artisan config:clear
           docker-compose run --rm backend php artisan route:clear
           docker-compose run --rm backend php artisan view:clear
           docker-compose run --rm backend php artisan cache:clear
-          docker-compose run --rm backend php artisan config:cache
+          
+          # Eliminar rutas duplicadas y cachear
+          docker-compose run --rm backend php artisan route:list | grep storage.serve || true
+          docker-compose run --rm backend php artisan route:clear
           docker-compose run --rm backend php artisan route:cache
+          
+          # Cachear el resto
+          docker-compose run --rm backend php artisan config:cache
           docker-compose run --rm backend php artisan view:cache
           docker-compose run --rm backend php artisan storage:link
           
