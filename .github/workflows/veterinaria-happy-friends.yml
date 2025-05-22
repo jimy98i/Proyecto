@@ -33,12 +33,24 @@ jobs:
           docker-compose run --rm frontend npm install
           docker-compose run --rm frontend npm run build
           
+          # Mover el build de Vite a la carpeta correcta de Nginx
+          mkdir -p ../backend/public/frontend
+          cp -r dist/* ../backend/public/frontend/
+          
           # Construir el backend (Laravel)
           cd ../backend
           docker-compose run --rm backend composer install --no-dev --optimize-autoloader
+          docker-compose run --rm backend php artisan config:clear
+          docker-compose run --rm backend php artisan route:clear
+          docker-compose run --rm backend php artisan view:clear
+          docker-compose run --rm backend php artisan cache:clear
+          
+          # Configurar Laravel para producción
+          docker-compose run --rm backend php artisan key:generate --force
           docker-compose run --rm backend php artisan config:cache
           docker-compose run --rm backend php artisan route:cache
           docker-compose run --rm backend php artisan view:cache
+          docker-compose run --rm backend php artisan storage:link
           
           # Volver al directorio raíz y construir los contenedores
           cd ..
