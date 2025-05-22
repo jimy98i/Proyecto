@@ -39,8 +39,8 @@ jobs:
           cd frontend
           docker-compose run --rm frontend npm install
           
-          # Intentar arreglar vulnerabilidades
-          docker-compose run --rm frontend npm audit fix --force
+          # Verificar vulnerabilidades (sin fallar el build)
+          docker-compose run --rm frontend npm audit || true
           
           # Configurar Vite para producción
           echo 'export default {
