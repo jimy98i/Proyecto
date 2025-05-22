@@ -50,8 +50,11 @@ jobs:
               rollupOptions: {
                 output: {
                   manualChunks: {
-                    vendor: ["react", "react-dom"],
-                    images: ["*.jpg", "*.png", "*.gif"]
+                    "react-vendor": ["react", "react-dom", "react-router-dom"],
+                    "ui-vendor": ["@mui/material", "@mui/icons-material", "@emotion/react", "@emotion/styled"],
+                    "utils-vendor": ["html2canvas", "dompurify"],
+                    "styles": ["*.css", "*.scss"],
+                    "images": ["*.jpg", "*.png", "*.gif", "*.webp"]
                   }
                 }
               }
@@ -61,7 +64,7 @@ jobs:
           
           # Mover el build de Vite a la carpeta correcta de Nginx
           mkdir -p ../backend/public/frontend
-          cp -r build/* ../backend/public/frontend/
+          cp -r dist/* ../backend/public/frontend/
           
           # Construir el backend (Laravel)
           cd ../backend
