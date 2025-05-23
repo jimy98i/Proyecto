@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '../auth/AuthContext';
 import logo from '../assets/logo/logo3.png';
-import LoginForm from '../components/LoginForm';
+import LoginForm from '../componentes/LoginForm';
 
 const Header = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
