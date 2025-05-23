@@ -9,154 +9,113 @@ on:
       - main
 
 jobs:
-  build-produccion:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      # Configurar Node.js para el Frontend
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: 'frontend/package-lock.json'
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Install Docker Compose
+      # Construir el Frontend
+      - name: Build Frontend
         run: |
-          sudo apt-get update
-          sudo apt-get install -y curl
-          sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-          docker-compose --version
-
-      - name: Build with Docker Compose
-        run: |
-          # Construir el frontend (React + Vite)
           cd frontend
-          docker-compose run --rm frontend npm install
-          
-          # Verificar vulnerabilidades (sin fallar el build)
-          docker-compose run --rm frontend npm audit || true
-          
-          # Configurar Vite para producción
-          echo 'export default {
-            build: {
-              chunkSizeWarningLimit: 16000,
-              rollupOptions: {
-                output: {
-                  manualChunks: (id) => {
-                    if (id.includes("node_modules")) {
-                      if (id.includes("@mui")) {
-                        return "mui-vendor";
-                      }
-                      if (id.includes("react") || id.includes("react-dom")) {
-                        return "react-vendor";
-                      }
-                      if (id.includes("html2canvas") || id.includes("dompurify")) {
-                        return "utils-vendor";
-                      }
-                      return "vendor";
-                    }
-                    if (id.includes(".css") || id.includes(".scss")) {
-                      return "styles";
-                    }
-                    if (id.includes(".jpg") || id.includes(".png") || id.includes(".gif") || id.includes(".webp")) {
-                      return "images";
-                    }
-                  }
-                }
-              }
-            }
-          }' > vite.config.js
-          docker-compose run --rm frontend npm run build
-          
-          # Mover el build de Vite a la carpeta correcta de Nginx
-          mkdir -p ../backend/public/frontend
-          cp -r dist/* ../backend/public/frontend/
-          
-          # Construir el backend (Laravel)
-          cd ../backend
-          docker-compose run --rm backend composer install --no-dev --optimize-autoloader
-          
-          # Configurar Laravel para producción
-          docker-compose run --rm backend php artisan key:generate --force
-          
-          # Deshabilitar Xdebug en producción
-          docker-compose run --rm backend sh -c '
-            # Deshabilitar completamente Xdebug
-            rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-            rm -f /usr/local/etc/php/conf.d/xdebug.ini
-          '
-          
-          # Ejecutar migraciones y seeders
-          docker-compose run --rm backend php artisan migrate --force
-          docker-compose run --rm backend php artisan db:seed --force
-          
-          # Limpiar todo antes de optimizar
-          docker-compose run --rm backend php artisan optimize:clear
-          docker-compose run --rm backend php artisan config:clear
-          docker-compose run --rm backend php artisan route:clear
-          docker-compose run --rm backend php artisan view:clear
-          docker-compose run --rm backend php artisan cache:clear
-          
-          # Optimizar la aplicación sin cachear rutas
-          docker-compose run --rm backend php artisan config:cache
-          docker-compose run --rm backend php artisan view:cache
-          docker-compose run --rm backend php artisan storage:link
-          
-          # Volver al directorio raíz y construir los contenedores
-          cd ..
-          docker-compose build
-          docker-compose up -d
-          
-          # Esperar a que los servicios estén listos
-          sleep 30
-          
-          # Verificar que los contenedores están corriendo
-          docker-compose ps
-          
-          # Verificar que Nginx está sirviendo correctamente
-          curl -I http://localhost:80
+          # Crear archivos .env
+          echo "VITE_API_URL=http://www.veterinariahappyfriends.es.mialias.net/api" > .env
+          echo "VITE_APP_URL=http://www.veterinariahappyfriends.es.mialias.net" >> .env
+          echo "VITE_API_URL=http://www.veterinariahappyfriends.es.mialias.net/api" > .env.production
+          echo "VITE_APP_URL=http://www.veterinariahappyfriends.es.mialias.net" >> .env.production
+          # Instalar dependencias y construir
+          npm install
+          npm run build
+          # Preparar directorio web
+          mkdir -p ../web
+          cp -r dist/* ../web/
+          # Crear .htaccess para React Router
+          echo "<IfModule mod_rewrite.c>" > ../web/.htaccess
+          echo "  RewriteEngine On" >> ../web/.htaccess
+          echo "  RewriteBase /" >> ../web/.htaccess
+          echo "  RewriteRule ^index\.html$ - [L]" >> ../web/.htaccess
+          echo "  RewriteCond %{REQUEST_FILENAME} !-f" >> ../web/.htaccess
+          echo "  RewriteCond %{REQUEST_FILENAME} !-d" >> ../web/.htaccess
+          echo "  RewriteRule . /index.html [L]" >> ../web/.htaccess
+          echo "</IfModule>" >> ../web/.htaccess
 
-      - name: Deploy to Production
-        if: github.ref == 'refs/heads/main'
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+      # Configurar PHP para el Backend
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, dom, fileinfo, mysql, zip
+          coverage: none
+
+      # Construir el Backend
+      - name: Build Backend
         run: |
-          echo "Deploying to production..."
-          
-          # Configurar SSH
-          mkdir -p ~/.ssh
-          echo "$DEPLOY_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          
-          # Añadir el host a known_hosts
-          ssh-keyscan -H $DEPLOY_HOST >> ~/.ssh/known_hosts
-          
-          # Crear archivo .env en el servidor si no existe
-          ssh -i ~/.ssh/deploy_key $DEPLOY_USER@$DEPLOY_HOST "mkdir -p $DEPLOY_PATH"
-          
-          # Copiar archivos al servidor
-          rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key" \
-            --exclude '.git' \
-            --exclude 'node_modules' \
-            --exclude 'vendor' \
-            ./ $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/
-          
-          # Ejecutar comandos en el servidor
-          ssh -i ~/.ssh/deploy_key $DEPLOY_USER@$DEPLOY_HOST "cd $DEPLOY_PATH && \
-            docker-compose down && \
-            docker-compose build --no-cache && \
-            docker-compose up -d"
-          
-          # Limpiar
-          rm -f ~/.ssh/deploy_key
+          cd backend
+          # Crear directorios necesarios
+          mkdir -p storage/app/public
+          mkdir -p storage/framework/cache
+          mkdir -p storage/framework/sessions
+          mkdir -p storage/framework/views
+          mkdir -p storage/logs
+          mkdir -p bootstrap/cache
+          mkdir -p public
+          # Instalar dependencias
+          composer install --no-dev --optimize-autoloader
+          # Crear .env
+          echo "APP_NAME=VeterinariaHappyFriends" > .env
+          echo "APP_ENV=production" >> .env
+          echo "APP_DEBUG=false" >> .env
+          echo "APP_URL=http://www.veterinariahappyfriends.es.mialias.net/api" >> .env
+          echo "DB_CONNECTION=mysql" >> .env
+          echo "DB_HOST=localhost" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_DATABASE=veterinaria" >> .env
+          echo "DB_USERNAME=myveterina33" >> .env
+          echo "DB_PASSWORD=7InS3vXl" >> .env
+          # Configurar Laravel
+          php artisan key:generate --force
+          php artisan config:cache
+          php artisan view:cache
+          # Crear enlace simbólico para storage
+          rm -f public/storage
+          ln -sfn ../storage/app/public public/storage
+          # Preparar directorio api
+          mkdir -p ../web/api
+          cp -r * ../web/api/
+          cp -r .env ../web/api/
+          # Crear .htaccess para Laravel
+          echo "<IfModule mod_rewrite.c>" > ../web/api/.htaccess
+          echo "  RewriteEngine On" >> ../web/api/.htaccess
+          echo "  RewriteBase /api/" >> ../web/api/.htaccess
+          echo "  RewriteCond %{REQUEST_FILENAME} !-d" >> ../web/api/.htaccess
+          echo "  RewriteCond %{REQUEST_FILENAME} !-f" >> ../web/api/.htaccess
+          echo "  RewriteRule ^ index.php [L]" >> ../web/api/.htaccess
+          echo "</IfModule>" >> ../web/api/.htaccess
+
+      # Preparar permisos
+      - name: Prepare Deployment
+        run: |
+          chmod -R 755 web
+          chmod -R 777 web/api/storage
+          chmod -R 777 web/api/bootstrap/cache
+
+      # Desplegar por FTP
+      - name: Deploy to Server
+        if: github.ref == 'refs/heads/main'
+        uses: SamKirkland/FTP-Deploy-Action@4.0.0
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./web/
+          server-dir: /web/
       
