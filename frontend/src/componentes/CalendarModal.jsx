@@ -23,17 +23,31 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
 
   useEffect(() => {
     if (initialData) {
-      console.log('Datos iniciales recibidos:', initialData);
+       // Validar la fecha si viene del calendario
+       if (initialData.fecha_cita) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const selectedDate = new Date(initialData.fecha_cita);
+        selectedDate.setHours(0, 0, 0, 0);
+        
+        if (selectedDate < today) {
+            alert('No puedes seleccionar una fecha anterior a hoy');
+            onRequestClose(); // Cerrar el modal si la fecha es inválida
+            return;
+        }
+      }
+
       setFormData({
-        id: initialData.id || '',
-        fecha_cita: initialData.fecha_cita || '',
-        hora_cita: initialData.hora_cita || '',
-        tipo_cita: initialData.tipo_cita || initialData.title || '',
-        estado: initialData.estado || 'programada',
-        notas: initialData.notas || initialData.descripcion || '',
-        linea_historial_id: initialData.linea_historial_id || '',
-        mascota_id: initialData.mascota_id || '',
-        user_id: initialData.user_id || localStorage.getItem('user_id') || ''
+          id: initialData.id || '',
+          fecha_cita: initialData.fecha_cita || '',
+          hora_cita: initialData.hora_cita || '',
+          tipo_cita: initialData.tipo_cita || initialData.title || '',
+          estado: initialData.estado || 'programada',
+          notas: initialData.notas || initialData.descripcion || '',
+          linea_historial_id: initialData.linea_historial_id || '',
+          mascota_id: initialData.mascota_id || '',
+          user_id: initialData.user_id || localStorage.getItem('user_id') || ''
       });
       
       // Si hay una mascota en los datos iniciales, cargar sus líneas de historial
@@ -231,9 +245,27 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    if (name === 'fecha_cita') {
+        // Obtener la fecha actual sin la hora
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Convertir la fecha seleccionada a objeto Date
+        const selectedDate = new Date(value);
+        selectedDate.setHours(0, 0, 0, 0);
+        
+        // Comparar las fechas
+        if (selectedDate < today) {
+            alert('No puedes seleccionar una fecha anterior a hoy');
+            e.target.value = ''; // Limpiar el input
+            return;
+        }
+    }
+
     setFormData(prevData => ({
-      ...prevData,
-      [name]: value
+        ...prevData,
+        [name]: value
     }));
   };
 
@@ -350,6 +382,10 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
 
   const generateTimeOptions = () => {
     const options = [];
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const isToday = formData.fecha_cita === now.toISOString().split('T')[0];
 
     // Generar intervalos de 9:30 a 14:30
     let startTime = new Date();
@@ -358,8 +394,15 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
     endTimeMorning.setHours(13, 30, 0, 0);
 
     while (startTime <= endTimeMorning) {
-      options.push(startTime.toTimeString().slice(0, 5));
-      startTime.setMinutes(startTime.getMinutes() + 30);
+        const timeStr = startTime.toTimeString().slice(0, 5);
+        
+        // Si es hoy, solo mostrar horas futuras
+        if (!isToday || (startTime.getHours() > currentHour || 
+            (startTime.getHours() === currentHour && startTime.getMinutes() > currentMinute))) {
+            options.push(timeStr);
+        }
+        
+        startTime.setMinutes(startTime.getMinutes() + 30);
     }
 
     // Generar intervalos de 17:00 a 21:00
@@ -368,8 +411,15 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
     endTimeEvening.setHours(21, 0, 0, 0);
 
     while (startTime <= endTimeEvening) {
-      options.push(startTime.toTimeString().slice(0, 5));
-      startTime.setMinutes(startTime.getMinutes() + 30);
+        const timeStr = startTime.toTimeString().slice(0, 5);
+        
+        // Si es hoy, solo mostrar horas futuras
+        if (!isToday || (startTime.getHours() > currentHour || 
+            (startTime.getHours() === currentHour && startTime.getMinutes() > currentMinute))) {
+            options.push(timeStr);
+        }
+        
+        startTime.setMinutes(startTime.getMinutes() + 30);
     }
 
     return options;
@@ -415,6 +465,7 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
                     name="fecha_cita"
                     value={formData.fecha_cita || ''}
                     onChange={handleInputChange}
+                    min={new Date().toISOString().split('T')[0]} // Añadir esta línea
                     required
                   />
                 </Form.Group>

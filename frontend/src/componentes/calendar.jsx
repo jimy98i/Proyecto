@@ -107,15 +107,29 @@ export default class Calendar extends React.Component {
   };
 
   handleDateSelect = (selectInfo) => {
-    const eventData = {
-      fecha_cita: selectInfo.startStr.split('T')[0],
-      hora_cita: selectInfo.startStr.split('T')[1]?.substring(0, 5) || '',
-      tipo_cita: '',
-      estado: 'programada',
-      notas: ''
-    };
-    // console.log('Datos para nueva cita:', eventData);
-    this.openModal('create', eventData);
+        // Obtener la fecha actual sin la hora
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Convertir la fecha seleccionada a objeto Date
+        const selectedDate = new Date(selectInfo.startStr);
+        selectedDate.setHours(0, 0, 0, 0);
+        
+        // Comparar las fechas
+        if (selectedDate < today) {
+            alert('No puedes seleccionar una fecha anterior a hoy');
+            return;
+        }
+    
+        const eventData = {
+            fecha_cita: selectInfo.startStr.split('T')[0],
+            hora_cita: selectInfo.startStr.split('T')[1]?.substring(0, 5) || '',
+            tipo_cita: '',
+            estado: 'programada',
+            notas: ''
+        };
+        
+        this.openModal('create', eventData);
   };
 
   handleEventClick = (info) => {

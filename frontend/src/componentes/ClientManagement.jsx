@@ -26,7 +26,7 @@ const ClientManagement = () => {
 
     const loadClients = async () => {
         try {
-            const response = await get('/users/clients/client');
+            const response = await get('/users/clients/cliente');
             if (!response.ok) {
                 throw new Error('Error al cargar clientes');
             }
@@ -177,9 +177,7 @@ const ClientManagement = () => {
                                 <th>Nombre</th>
                                 <th>Email</th>
                                 <th>Teléfono</th>
-                                <th>DNI</th>
                                 <th>Dirección</th>
-                                <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -189,13 +187,7 @@ const ClientManagement = () => {
                                     <td>{client.nombre}</td>
                                     <td>{client.email}</td>
                                     <td>{client.telefono}</td>
-                                    <td>{client.dni}</td>
                                     <td>{client.direccion}</td>
-                                    <td>
-                                        <Badge bg={client.active ? 'success' : 'danger'}>
-                                            {client.active ? 'Activo' : 'Inactivo'}
-                                        </Badge>
-                                    </td>
                                     <td>
                                         <Button
                                             variant="outline-primary"
