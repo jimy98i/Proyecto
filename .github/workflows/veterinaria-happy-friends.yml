@@ -28,24 +28,24 @@ jobs:
         run: |
           cd frontend
           # Crear archivos .env
-          echo "VITE_API_URL=http://www.veterinariahappyfriends.es.mialias.net/api" > .env
-          echo "VITE_APP_URL=http://www.veterinariahappyfriends.es.mialias.net" >> .env
-          echo "VITE_API_URL=http://www.veterinariahappyfriends.es.mialias.net/api" > .env.production
-          echo "VITE_APP_URL=http://www.veterinariahappyfriends.es.mialias.net" >> .env.production
+          echo "VITE_API_URL=/deploy/236_Proyecto_main/public/api" > .env
+          echo "VITE_APP_URL=/web" >> .env
+          echo "VITE_API_URL=/deploy/236_Proyecto_main/public/api" > .env.production
+          echo "VITE_APP_URL=/web" >> .env.production
           # Instalar dependencias y construir
           npm install
           npm run build
           # Preparar directorio web
           mkdir -p ../web
-          cp -r ../public/build/* ../web/
+          cp -r dist/* ../web/
           # Crear .htaccess para React Router
           echo "<IfModule mod_rewrite.c>" > ../web/.htaccess
           echo "  RewriteEngine On" >> ../web/.htaccess
-          echo "  RewriteBase /" >> ../web/.htaccess
+          echo "  RewriteBase /web/" >> ../web/.htaccess
           echo "  RewriteRule ^index\.html$ - [L]" >> ../web/.htaccess
           echo "  RewriteCond %{REQUEST_FILENAME} !-f" >> ../web/.htaccess
           echo "  RewriteCond %{REQUEST_FILENAME} !-d" >> ../web/.htaccess
-          echo "  RewriteRule . /index.html [L]" >> ../web/.htaccess
+          echo "  RewriteRule . /web/index.html [L]" >> ../web/.htaccess
           echo "</IfModule>" >> ../web/.htaccess
 
       # Configurar PHP para el Backend
@@ -74,7 +74,7 @@ jobs:
           echo "APP_NAME=VeterinariaHappyFriends" > .env
           echo "APP_ENV=production" >> .env
           echo "APP_DEBUG=false" >> .env
-          echo "APP_URL=http://www.veterinariahappyfriends.es.mialias.net/api" >> .env
+          echo "APP_URL=/deploy/236_Proyecto_main/public" >> .env
           echo "DB_CONNECTION=mysql" >> .env
           echo "DB_HOST=localhost" >> .env
           echo "DB_PORT=3306" >> .env
@@ -88,25 +88,26 @@ jobs:
           # Crear enlace simbólico para storage
           rm -f public/storage
           ln -sfn ../storage/app/public public/storage
-          # Preparar directorio api
-          mkdir -p ../web/api
-          cp -r * ../web/api/
-          cp -r .env ../web/api/
+          # Preparar directorio de despliegue
+          mkdir -p ../deploy/236_Proyecto_main
+          cp -r * ../deploy/236_Proyecto_main/
+          cp -r .env ../deploy/236_Proyecto_main/
           # Crear .htaccess para Laravel
-          echo "<IfModule mod_rewrite.c>" > ../web/api/.htaccess
-          echo "  RewriteEngine On" >> ../web/api/.htaccess
-          echo "  RewriteBase /api/" >> ../web/api/.htaccess
-          echo "  RewriteCond %{REQUEST_FILENAME} !-d" >> ../web/api/.htaccess
-          echo "  RewriteCond %{REQUEST_FILENAME} !-f" >> ../web/api/.htaccess
-          echo "  RewriteRule ^ index.php [L]" >> ../web/api/.htaccess
-          echo "</IfModule>" >> ../web/api/.htaccess
+          echo "<IfModule mod_rewrite.c>" > ../deploy/236_Proyecto_main/public/.htaccess
+          echo "  RewriteEngine On" >> ../deploy/236_Proyecto_main/public/.htaccess
+          echo "  RewriteBase /deploy/236_Proyecto_main/public/" >> ../deploy/236_Proyecto_main/public/.htaccess
+          echo "  RewriteCond %{REQUEST_FILENAME} !-d" >> ../deploy/236_Proyecto_main/public/.htaccess
+          echo "  RewriteCond %{REQUEST_FILENAME} !-f" >> ../deploy/236_Proyecto_main/public/.htaccess
+          echo "  RewriteRule ^ index.php [L]" >> ../deploy/236_Proyecto_main/public/.htaccess
+          echo "</IfModule>" >> ../deploy/236_Proyecto_main/public/.htaccess
 
       # Preparar permisos
       - name: Prepare Deployment
         run: |
           chmod -R 755 web
-          chmod -R 777 web/api/storage
-          chmod -R 777 web/api/bootstrap/cache
+          chmod -R 755 deploy
+          chmod -R 777 deploy/236_Proyecto_main/storage
+          chmod -R 777 deploy/236_Proyecto_main/bootstrap/cache
 
       # Desplegar por FTP
       - name: Deploy to Server
@@ -116,6 +117,6 @@ jobs:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./web/
-          server-dir: /web/
+          local-dir: ./
+          server-dir: /
       
