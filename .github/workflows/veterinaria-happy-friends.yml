@@ -37,10 +37,10 @@ jobs:
           npm run build
           # Verificar estructura de directorios
           ls -la
-          ls -la frontend
+          ls -la public
           # Preparar directorio web
           mkdir -p ../web
-          cp -r frontend/dist/* ../web/
+          cp -r public/build/* ../web/
           # Crear .htaccess para React Router
           echo "<IfModule mod_rewrite.c>" > ../web/.htaccess
           echo "  RewriteEngine On" >> ../web/.htaccess
