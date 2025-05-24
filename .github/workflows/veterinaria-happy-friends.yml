@@ -35,9 +35,12 @@ jobs:
           # Instalar dependencias y construir
           npm install
           npm run build
+          # Verificar estructura de directorios
+          ls -la
+          ls -la frontend
           # Preparar directorio web
           mkdir -p ../web
-          cp -r dist/* ../web/
+          cp -r frontend/dist/* ../web/
           # Crear .htaccess para React Router
           echo "<IfModule mod_rewrite.c>" > ../web/.htaccess
           echo "  RewriteEngine On" >> ../web/.htaccess
