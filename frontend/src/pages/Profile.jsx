@@ -4,6 +4,7 @@ import { useAuth } from '../auth/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faPaw, faHistory, faCamera } from '@fortawesome/free-solid-svg-icons';
 import PetList from '../componentes/PetList';
+import PetHistory from '../componentes/PetHistory';
 import UploadPhotoButton from '../componentes/UploadPhotoButton';
 import { useNavigate } from 'react-router-dom';
 import '../css/Profile.css';
@@ -194,7 +195,7 @@ const Profile = () => {
                             )}
 
                             {activeTab === 'pets' && <PetList />}
-                            {activeTab === 'history' && <div>Historial de visitas</div>}
+                            {activeTab === 'history' && <PetHistory />}
                         </Card.Body>
                     </Card>
                 </Col>

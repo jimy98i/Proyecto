@@ -40,12 +40,22 @@ export default class Calendar extends React.Component {
       modalData: { title: '', start: '', end: '', allDay: false }, // Datos iniciales del modal
       modalAction: null, // Acción actual (crear, editar, etc.)
       pendingAppointments: [],
-      showHelp: false
+      showHelp: false,
+      isMobile: window.innerWidth <= 768
     }
   }
 
   componentDidMount() {
     this.loadEvents();
+    window.addEventListener('resize', this.handleResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
+  }
+
+  handleResize = () => {
+    this.setState({ isMobile: window.innerWidth <= 768 });
   }
 
   loadEvents = async () => {
@@ -158,10 +168,11 @@ export default class Calendar extends React.Component {
 
   render() {
     const isAdmin = localStorage.getItem('userRole') === 'admin';
+    const { isMobile } = this.state;
     
     return (
       <div className='demo-app'>
-        {this.renderSidebar()}
+        {!isMobile && this.renderSidebar()}
         <div className='demo-app-main'>
           <div className="calendar-container">
             <div className="calendar-controls">
@@ -176,16 +187,18 @@ export default class Calendar extends React.Component {
                 ref={this.calendarRef}
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 headerToolbar={{
-                  left: 'prev,next today',
+                  left: isMobile ? 'prev,next' : 'prev,next today',
                   center: 'title',
-                  right: isAdmin ? 'dayGridMonth,timeGridWeek,timeGridDay' : 'timeGridWeek'
+                  right: isAdmin 
+                    ? (isMobile ? 'dayGridMonth,timeGridDay' : 'dayGridMonth,timeGridWeek,timeGridDay')
+                    : (isMobile ? 'timeGridDay' : 'timeGridWeek')
                 }}
-                initialView={isAdmin ? 'dayGridMonth' : 'timeGridWeek'}
+                initialView={isMobile ? 'timeGridDay' : (isAdmin ? 'dayGridMonth' : 'timeGridWeek')}
                 editable={true}
                 allDaySlot={false}
                 selectable={true}
                 selectMirror={true}
-                dayMaxEvents={true}
+                dayMaxEvents={!isMobile}
                 weekends={this.state.weekendsVisible}
                 events={this.state.currentEvents}
                 select={this.handleDateSelect}
@@ -193,6 +206,21 @@ export default class Calendar extends React.Component {
                 eventChange={this.handleEventChange}
                 eventDisplay="block"
                 eventTimeFormat={{
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: false
+                }}
+                height={isMobile ? 'auto' : 'auto'}
+                contentHeight={isMobile ? 'auto' : 'auto'}
+                aspectRatio={isMobile ? 1.35 : 1.5}
+                expandRows={isMobile}
+                stickyHeaderDates={true}
+                nowIndicator={true}
+                slotMinTime="09:00:00"
+                slotMaxTime="21:00:00"
+                slotDuration="00:30:00"
+                slotLabelInterval="01:00"
+                slotLabelFormat={{
                   hour: '2-digit',
                   minute: '2-digit',
                   hour12: false
@@ -221,8 +249,9 @@ export default class Calendar extends React.Component {
 
   renderSidebar() {
     const userRole = localStorage.getItem('userRole');
+    const { isMobile } = this.state;
 
-    if (userRole !== 'admin') {
+    if (userRole !== 'admin' || isMobile) {
       return null;
     }
 

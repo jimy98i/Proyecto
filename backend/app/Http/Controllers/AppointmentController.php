@@ -247,4 +247,24 @@ class AppointmentController extends Controller
             ], 500);
         }
     }
+
+    public function searchHistoryLines(Request $request): JsonResponse
+    {
+        $query = $request->input('query');
+        $historyLines = $this->appointmentService->searchHistoryLines($query);
+        return response()->json($historyLines);
+    }
+
+    public function assignHistoryLine(Request $request, Appointment $appointment): JsonResponse
+    {
+        $historyLineId = $request->input('history_line_id');
+        $appointment = $this->appointmentService->assignHistoryLine($appointment->id, $historyLineId);
+        return response()->json($appointment);
+    }
+
+    public function unassignHistoryLine(Appointment $appointment): JsonResponse
+    {
+        $appointment = $this->appointmentService->unassignHistoryLine($appointment->id);
+        return response()->json($appointment);
+    }
 }

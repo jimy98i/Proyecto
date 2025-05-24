@@ -44,7 +44,9 @@ class TreatmentService
 
     public function getTreatmentsByHistory(int $historyId): Collection
     {
-        return Treatment::where('historial_id', $historyId)->with(['history', 'medications', 'products'])->get();
+        return Treatment::where('historial_id', $historyId)
+            ->with(['history', 'products'])
+            ->get();
     }
 
     public function getTreatmentsWithMedications(int $historyLineId): Collection

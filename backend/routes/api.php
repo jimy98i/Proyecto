@@ -61,10 +61,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 // Rutas para el modelo History
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/history/{history}', [HistoryController::class, 'show']); // Obtener un historial específico
     Route::get('/history', [HistoryController::class, 'index']); // Obtener todos los historiales
     Route::post('/history', [HistoryController::class, 'store']); // Crear un nuevo historial
-    Route::get('/history/{history}', [HistoryController::class, 'show']); // Obtener un historial específico
+    Route::get('/history/{petId}', [HistoryController::class, 'getByPet']); // Obtener un historial específico
     Route::put('/history/{history}', [HistoryController::class, 'update']); // Actualizar un historial
     Route::delete('/history/{history}', [HistoryController::class, 'destroy']); // Eliminar un historial
 });
@@ -74,7 +73,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/historyline', [HistoryLineController::class, 'index']); // Obtener todas las líneas de historial
     Route::post('/historyline', [HistoryLineController::class, 'store']); // Crear una nueva línea de historial
-    Route::get('/historyline/{historyLine}', [HistoryLineController::class, 'show']); // Obtener una línea de historial específica
+    Route::get('/historyline/{historyLine}', [HistoryLineController::class, 'getByHistory']); // Obtener una línea de historial específica
     Route::put('/historyline/{historyLine}', [HistoryLineController::class, 'update']); // Actualizar una línea de historial
     Route::delete('/historyline/{historyLine}', [HistoryLineController::class, 'destroy']); // Eliminar una línea de historial
 });
@@ -117,11 +116,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/appointment/check-availability', [AppointmentController::class, 'checkAvailability']); // Comprobacion de fecha y hora
     Route::put('/appointment/{appointment}', [AppointmentController::class, 'update']); // Actualizar una cita
     Route::delete('/appointment/{appointment}', [AppointmentController::class, 'destroy']); // Eliminar una cita
+    Route::get('/appointments/search-history', [AppointmentController::class, 'searchHistoryLines']);
+    Route::post('/appointments/{appointment}/assign-history', [AppointmentController::class, 'assignHistoryLine']);
+    Route::post('/appointments/{appointment}/unassign-history', [AppointmentController::class, 'unassignHistoryLine']);
 });
 
 // Rutas para el modelo Treatment
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/treatment', [TreatmentController::class, 'index']); // Obtener todos los tratamientos
+    Route::get('/treatment/history/{historyId}', [TreatmentController::class, 'getByHistory']); // Obtener todos los tratamientos
     Route::post('/treatment', [TreatmentController::class, 'store']); // Crear un nuevo tratamiento
     Route::get('/treatment/{treatment}', [TreatmentController::class, 'show']); // Obtener un tratamiento específico
     Route::put('/treatment/{treatment}', [TreatmentController::class, 'update']); // Actualizar un tratamiento
@@ -167,3 +170,5 @@ Route::middleware(['api'])->group(function () {
         ->where('path', '.*')
         ->name('storage.serve');
 });
+
+// Rutas para la gestión de historiales en citas

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, ButtonGroup } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
+import { FaFileExcel, FaFilePdf, FaFileCsv } from 'react-icons/fa';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { get } from '../utils/api';
@@ -195,33 +196,31 @@ const ExportButtons = () => {
     };
 
     return (
-        <div className="export-buttons" style={{ justifyContent: 'flex-end' }}>
-            <ButtonGroup>
-                <Button 
-                    variant="outline-success" 
-                    onClick={exportToExcel}
-                    style={{ borderColor: '#198754', color: '#198754' }}
-                >
-                    <i className="bi bi-file-earmark-excel me-2"></i>
-                    Excel
-                </Button>
-                <Button 
-                    variant="outline-primary" 
-                    onClick={exportToCSV}
-                    style={{ borderColor: '#0d6efd', color: '#0d6efd' }}
-                >
-                    <i className="bi bi-file-earmark-text me-2"></i>
-                    CSV
-                </Button>
-                <Button 
-                    variant="outline-danger" 
-                    onClick={exportToPDF}
-                    style={{ borderColor: '#dc3545', color: '#dc3545' }}
-                >
-                    <i className="bi bi-file-earmark-pdf me-2"></i>
-                    PDF
-                </Button>
-            </ButtonGroup>
+        <div className="export-buttons">
+            <Button 
+                variant="outline-success" 
+                className="export-btn"
+                title="Exportar a Excel"
+                onClick={exportToExcel}
+            >
+                <FaFileExcel />
+            </Button>
+            <Button 
+                variant="outline-danger" 
+                className="export-btn"
+                title="Exportar a PDF"
+                onClick={exportToPDF}
+            >
+                <FaFilePdf />
+            </Button>
+            <Button 
+                variant="outline-primary" 
+                className="export-btn"
+                title="Exportar a CSV"
+                onClick={exportToCSV}
+            >
+                <FaFileCsv />
+            </Button>
         </div>
     );
 };

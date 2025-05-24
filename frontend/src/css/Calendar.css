@@ -177,29 +177,225 @@
     margin-bottom: 1rem;
     display: flex;
     justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0.5rem;
 }
 
 .export-buttons .btn {
-    padding: 0.375rem 0.75rem;
-    font-size: 0.875rem;
-    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
     align-items: center;
-    gap: 0.25rem;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.export-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .export-buttons .btn i {
-    font-size: 1rem;
+    font-size: 1.2rem;
+    color: inherit;
+}
+
+.export-buttons .btn-outline-success:hover {
+    background-color: #198754;
+    border-color: #198754;
+    color: white;
+}
+
+.export-buttons .btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.export-buttons .btn-outline-primary:hover {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+/* Ajustes responsive para los botones de exportación */
+@media (max-width: 768px) {
+    .export-buttons {
+        justify-content: center;
+        padding: 0.5rem;
+    }
+
+    .export-buttons .btn {
+        width: 35px;
+        height: 35px;
+    }
+
+    .export-buttons .btn i {
+        font-size: 1rem;
+    }
+}
+
+/* Estilos específicos para tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .export-buttons {
+        justify-content: flex-end;
+        padding: 0.75rem;
+    }
+
+    .export-buttons .btn {
+        width: 38px;
+        height: 38px;
+    }
 }
 
 .calendar-container {
     position: relative;
     width: 100%;
     padding: 1rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .calendar-wrapper {
     background: white;
     border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     padding: 1rem;
+    margin-top: 1rem;
+}
+
+/* Estilos responsive para móviles y tablets */
+@media (max-width: 768px) {
+    .demo-app {
+        flex-direction: column;
+    }
+
+    .demo-app-main {
+        padding: 1rem;
+    }
+
+    .app-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #dee2e6;
+        padding: 1rem;
+    }
+
+    .fc .fc-toolbar {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .fc .fc-toolbar-chunk {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1.2em !important;
+    }
+
+    .fc .fc-button {
+        padding: 0.4em 0.8em;
+        font-size: 0.9em;
+    }
+
+    .fc .fc-view-harness {
+        font-size: 0.9em;
+    }
+
+    .fc .fc-daygrid-day {
+        min-height: 80px;
+    }
+
+    .fc .fc-event {
+        font-size: 0.75em;
+        padding: 1px 2px;
+    }
+
+    .fc .fc-timegrid-slot {
+        height: 2.5em !important;
+    }
+
+    .fc .fc-timegrid-slot-label {
+        font-size: 0.8em;
+    }
+
+    .fc .fc-col-header-cell {
+        font-size: 0.8em;
+    }
+
+    .calendar-container {
+        padding: 0.5rem;
+    }
+
+    .calendar-wrapper {
+        padding: 0.5rem;
+    }
+}
+
+/* Estilos específicos para tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .demo-app {
+        flex-direction: row;
+    }
+
+    .app-sidebar {
+        width: 250px;
+    }
+
+    .fc .fc-toolbar {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .fc .fc-toolbar-chunk {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1.3em !important;
+    }
+
+    .fc .fc-button {
+        padding: 0.45em 0.9em;
+        font-size: 0.95em;
+    }
+
+    .fc .fc-view-harness {
+        font-size: 0.95em;
+    }
+
+    .fc .fc-daygrid-day {
+        min-height: 90px;
+    }
+
+    .fc .fc-event {
+        font-size: 0.8em;
+    }
+}
+
+/* Ajustes para el modal en dispositivos móviles */
+@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-control {
+        font-size: 16px; /* Evita el zoom en iOS */
+    }
 } 

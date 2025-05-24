@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Appointment;
+use App\Models\HistoryLine;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -150,6 +151,46 @@ class AppointmentService
                 'historyLine.history.pet:id,nombre,tipo'
             ])
             ->get();
+    }
+
+    public function searchHistoryLines(string $query): Collection
+    {
+        return HistoryLine::where('descripcion', 'like', "%{$query}%")
+            ->with(['history.pet', 'history.pet.client'])
+            ->get()
+            ->map(function ($historyLine) {
+                return [
+                    'id' => $historyLine->id,
+                    'descripcion' => $historyLine->descripcion,
+                    'fecha' => $historyLine->fecha->format('Y-m-d'),
+                    'estado' => $historyLine->estado,
+                    'mascota' => [
+                        'id' => $historyLine->history->pet->id,
+                        'nombre' => $historyLine->history->pet->nombre,
+                        'tipo' => $historyLine->history->pet->tipo,
+                        'cliente' => [
+                            'id' => $historyLine->history->pet->client->id,
+                            'nombre' => $historyLine->history->pet->client->nombre
+                        ]
+                    ]
+                ];
+            });
+    }
+
+    public function assignHistoryLine(int $appointmentId, int $historyLineId): Appointment
+    {
+        $appointment = $this->findById($appointmentId);
+        $appointment->linea_historial_id = $historyLineId;
+        $appointment->save();
+        return $appointment->load(['historyLine.history.pet', 'historyLine.history.pet.client']);
+    }
+
+    public function unassignHistoryLine(int $appointmentId): Appointment
+    {
+        $appointment = $this->findById($appointmentId);
+        $appointment->linea_historial_id = null;
+        $appointment->save();
+        return $appointment;
     }
 
     /**

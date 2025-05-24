@@ -30,12 +30,6 @@ class Treatment extends Model
         return $this->belongsTo(History::class, 'historial_id');
     }
 
-    public function medications()
-    {
-        return $this->belongsToMany(Medication::class, 'treatment_products')
-                    ->withPivot('cantidad');
-    }
-
     public function products()
     {
         return $this->belongsToMany(Product::class, 'treatment_products')

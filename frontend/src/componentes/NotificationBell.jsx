@@ -39,7 +39,7 @@ const NotificationBell = () => {
   return (
     <OverlayTrigger
       trigger="click"
-      placement="bottom"
+      placement="left"
       overlay={
         <Popover id="popover-basic">
           <Popover.Header as="h3">Citas Programadas</Popover.Header>
@@ -82,7 +82,10 @@ const NotificationBell = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          margin: '0 10px'
+          margin: '0 10px',
+          backgroundColor: '#34495e',
+          borderColor: '#34495e',
+          color: '#ecf0f1'
         }}
       >
         <FaBell style={{ fontSize: '1.2rem' }} />

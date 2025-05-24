@@ -43,7 +43,6 @@ const Header = () => {
               <Nav.Link as={NavLink} to="/home" style={{ color: '#004d40' }}>Home</Nav.Link>
               <Nav.Link as={NavLink} to="/contacto" style={{ color: '#004d40' }}>Contacto</Nav.Link>
               <Nav.Link as={NavLink} to="/nosotros" style={{ color: '#004d40' }}>Nosotros</Nav.Link>
-              <Nav.Link as={NavLink} to="/empleados" style={{ color: '#004d40' }}>Empleados</Nav.Link>
               <Nav.Link as={NavLink} to="/servicios" style={{ color: '#004d40' }}>Servicios</Nav.Link>
               {userRole === 'cliente' && (
                 <Nav.Link as={NavLink} to="/client/citas" style={{ color: '#004d40' }}>Citas</Nav.Link>

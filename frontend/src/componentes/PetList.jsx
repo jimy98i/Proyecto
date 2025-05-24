@@ -66,7 +66,7 @@ const PetList = () => {
     setSelectedPet(pet);
     setFormData({
       nombre: pet.nombre,
-      especie: pet.especie,
+      especie: pet.tipo,
       raza: pet.raza,
       edad: pet.edad,
       peso: pet.peso,
@@ -129,7 +129,7 @@ const PetList = () => {
           {pets.map(pet => (
             <tr key={pet.id}>
               <td>{pet.nombre}</td>
-              <td>{pet.especie}</td>
+              <td>{pet.tipo}</td>
               <td>{pet.raza}</td>
               <td>{pet.edad}</td>
               <td>{pet.peso}</td>
