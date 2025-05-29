@@ -34,11 +34,19 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           rm -rf deploy-dist
-          mkdir -p deploy-dist/backend deploy-dist/frontend
+
+          mkdir -p deploy-dist/backend
           # Copiar backend necesario
           rsync -av --exclude='node_modules' --exclude='tests' --exclude='.env.example' --exclude='README.md' backend/ deploy-dist/backend/
-          # Copiar frontend compilado
-          rsync -av frontend/dist/ deploy-dist/frontend/
+          # Copiar build del frontend dentro de la carpeta pública del backend
+          rm -rf deploy-dist/backend/public/build
+          mkdir -p deploy-dist/backend/public/build
+          rsync -av backend/public/build/ deploy-dist/backend/public/build/
+
+      - name: Debug frontend build
+        run: |
+          echo "Contenido de backend/public/build tras el build de Vite:"
+          ls -l backend/public/build || echo "No existe backend/public/build"
 
       - name: Deploy to Production (FTP)
         if: github.ref == 'refs/heads/main'
@@ -47,8 +55,8 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_TARGET || '/web/public' }}
-          local-dir: ./deploy-dist/
+          server-dir: ${{ secrets.FTP_TARGET || '/web/public/' }}
+          local-dir: ./deploy-dist/backend/
           exclude: |
             **/.git*
             **/node_modules/**
