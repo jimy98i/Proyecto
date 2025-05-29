@@ -42,10 +42,8 @@ jobs:
 
       - name: Debug frontend build
         run: |
-          echo "Contenido de frontend:"
-          ls -l frontend
-          echo "Contenido de frontend/dist:"
-          ls -l frontend/dist || echo "No existe frontend/dist"
+          echo "Contenido de backend/public/build tras el build de Vite:"
+          ls -l backend/public/build || echo "No existe backend/public/build"
 
       - name: Deploy to Production (FTP)
         if: github.ref == 'refs/heads/main'
