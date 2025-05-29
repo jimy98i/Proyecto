@@ -40,6 +40,13 @@ jobs:
           # Copiar frontend compilado
           rsync -av frontend/dist/ deploy-dist/frontend/
 
+      - name: Debug frontend build
+        run: |
+          echo "Contenido de frontend:"
+          ls -l frontend
+          echo "Contenido de frontend/dist:"
+          ls -l frontend/dist || echo "No existe frontend/dist"
+
       - name: Deploy to Production (FTP)
         if: github.ref == 'refs/heads/main'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4

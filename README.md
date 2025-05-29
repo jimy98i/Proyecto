@@ -130,3 +130,15 @@ El archivo `backend/database/init.sql` contiene scripts para inicializar la base
   - Logs de Docker accesibles con `docker logs <NOMBRE_DEL_CONTENEDOR>`.
 
 --- 
+
+## Créditos y Licencia
+
+Desarrollado por Jaime Lobon Villanueva. Uso educativo.
+
+Este proyecto está licenciado bajo una Licencia Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0).
+
+[![Licencia CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es)
+
+Puedes copiar, redistribuir, mezclar, transformar y construir a partir del material, siempre que se dé crédito, no se use con fines comerciales y las nuevas creaciones se licencien bajo los mismos términos.
+
+---
