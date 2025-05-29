@@ -108,9 +108,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 // Rutas para el modelo Appointment
-Route::get('/appointment', [AppointmentController::class, 'index']); // Obtener todas las citas
-
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/appointment', [AppointmentController::class, 'index']); // Obtener todas las citas
     Route::post('/appointment', [AppointmentController::class, 'store']); // Crear una nueva cita
     Route::get('/appointment/{appointment}', [AppointmentController::class, 'show']); // Obtener una cita específica
     Route::post('/appointment/check-availability', [AppointmentController::class, 'checkAvailability']); // Comprobacion de fecha y hora

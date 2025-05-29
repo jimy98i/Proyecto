@@ -129,9 +129,9 @@ class AppointmentService
 
     public function create(array $data): Appointment
     {
-        // dd($data);
         $data['linea_historial_id'] = $data['linea_historial_id'] ?? null;
         $this->validateHistoryLine($data);
+        // dd($data);
         return Appointment::create($data);
     }
 

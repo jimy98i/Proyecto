@@ -25,15 +25,14 @@ class AppointmentController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = Auth::user();
-        
+
         if ($user->rol === 'cliente') {
             $appointments = $this->appointmentService->getClientAppointments();
-            $historyLineId = $this->appointmentService->getHistoryLineIdFromRequest();
-            $formattedAppointments = $appointments->map(function ($appointment) {
+            $formattedAppointments = $appointments->map(function ($appointment) use ($user) {
                 return [
                     'id' => $appointment->id,
                     'title' => $appointment->tipo_cita,
-                    'start' => $appointment->fecha_cita->format('Y-m-d') . $appointment->hora_cita,
+                    'start' => $appointment->fecha_cita->format('Y-m-d') . 'T' . $appointment->hora_cita,
                     'status' => $appointment->estado,
                     'notas' => $appointment->notas,
                     'user_id' => $appointment->user_id,
@@ -191,21 +190,21 @@ class AppointmentController extends Controller
 
     public function update(UpdateAppointmentRequest $request, Appointment $appointment): JsonResponse
     {
-        $oldStatus = $appointment->estado;
+        $oldStatus = $appointment->getOriginal('estado');
         $appointment->fill($request->all());
         $appointment->save();
-
-        dd($appointment->toArray());
+        
         // Si el estado cambió de programada a confirmada
         if ($oldStatus === 'programada' && $appointment->estado === 'confirmada') {
             $user = $appointment->user; // Relación user en el modelo Appointment
-            if ($user && $user->email) {
-                \Log::info('Intentando enviar correo de confirmación', [
+            if ($user->email) {
+                Log::info('Intentando enviar correo de confirmación', [
                     'user_email' => $user->email,
                     'appointment_id' => $appointment->id
                 ]);
+                // dd($appointment->user->email);
                 Mail::to($user->email)->send(new AppointmentConfirmedMail($appointment, $user));
-                \Log::info('Correo de confirmación enviado');
+                Log::info('Correo de confirmación enviado');
             }
         }
 
