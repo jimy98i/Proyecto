@@ -15,111 +15,54 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # Configurar Node.js para el Frontend
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: 'frontend/package-lock.json'
-
-      # Construir el Frontend
-      - name: Build Frontend
+      - name: Build Frontend and Backend
         run: |
+          # Construir el frontend (React + Vite)
           cd frontend
-          # Crear archivos .env
-          echo "VITE_API_URL=/deploy/236_Proyecto_main/public/api" > .env
-          echo "VITE_APP_URL=/web" >> .env
-          echo "VITE_API_URL=/deploy/236_Proyecto_main/public/api" > .env.production
-          echo "VITE_APP_URL=/web" >> .env.production
-          # Instalar dependencias y construir
           npm install
           npm run build
-          # Verificar estructura de directorios
-          ls -la
-          ls -la ../public
-          # Preparar directorio web
-          mkdir -p ../web
-          cp -r ../public/build/* ../web/
-          # Crear .htaccess para React Router
-          echo "<IfModule mod_rewrite.c>" > ../web/.htaccess
-          echo "  RewriteEngine On" >> ../web/.htaccess
-          echo "  RewriteBase /web/" >> ../web/.htaccess
-          echo "  RewriteRule ^index\.html$ - [L]" >> ../web/.htaccess
-          echo "  RewriteCond %{REQUEST_FILENAME} !-f" >> ../web/.htaccess
-          echo "  RewriteCond %{REQUEST_FILENAME} !-d" >> ../web/.htaccess
-          echo "  RewriteRule . /web/index.html [L]" >> ../web/.htaccess
-          echo "</IfModule>" >> ../web/.htaccess
-
-      # Configurar PHP para el Backend
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          extensions: mbstring, dom, fileinfo, mysql, zip
-          coverage: none
-
-      # Construir el Backend
-      - name: Build Backend
-        run: |
+          cd ..
+          # Construir el backend (Laravel)
           cd backend
-          # Crear directorios necesarios
-          mkdir -p storage/app/public
-          mkdir -p storage/framework/cache
-          mkdir -p storage/framework/sessions
-          mkdir -p storage/framework/views
-          mkdir -p storage/logs
-          mkdir -p bootstrap/cache
-          mkdir -p public
-          # Instalar dependencias
           composer install --no-dev --optimize-autoloader
-          # Crear .env
-          echo "APP_NAME=VeterinariaHappyFriends" > .env
-          echo "APP_ENV=production" >> .env
-          echo "APP_DEBUG=false" >> .env
-          echo "APP_URL=/deploy/236_Proyecto_main/public" >> .env
-          echo "DB_CONNECTION=mysql" >> .env
-          echo "DB_HOST=localhost" >> .env
-          echo "DB_PORT=3306" >> .env
-          echo "DB_DATABASE=veterinaria" >> .env
-          echo "DB_USERNAME=myveterina33" >> .env
-          echo "DB_PASSWORD=7InS3vXl" >> .env
-          # Configurar Laravel
-          php artisan key:generate --force
           php artisan config:cache
+          php artisan route:cache
           php artisan view:cache
-          # Crear enlace simbólico para storage
-          rm -f public/storage
-          ln -sfn ../storage/app/public public/storage
-          # Preparar directorio de despliegue
-          mkdir -p ../deploy/236_Proyecto_main
-          cp -r * ../deploy/236_Proyecto_main/
-          cp -r .env ../deploy/236_Proyecto_main/
-          # Crear .htaccess para Laravel
-          echo "<IfModule mod_rewrite.c>" > ../deploy/236_Proyecto_main/public/.htaccess
-          echo "  RewriteEngine On" >> ../deploy/236_Proyecto_main/public/.htaccess
-          echo "  RewriteBase /deploy/236_Proyecto_main/public/" >> ../deploy/236_Proyecto_main/public/.htaccess
-          echo "  RewriteCond %{REQUEST_FILENAME} !-d" >> ../deploy/236_Proyecto_main/public/.htaccess
-          echo "  RewriteCond %{REQUEST_FILENAME} !-f" >> ../deploy/236_Proyecto_main/public/.htaccess
-          echo "  RewriteRule ^ index.php [L]" >> ../deploy/236_Proyecto_main/public/.htaccess
-          echo "</IfModule>" >> ../deploy/236_Proyecto_main/public/.htaccess
+          cd ..
 
-      # Preparar permisos
-      - name: Prepare Deployment
-        run: |
-          chmod -R 755 web
-          chmod -R 755 deploy
-          chmod -R 777 deploy/236_Proyecto_main/storage
-          chmod -R 777 deploy/236_Proyecto_main/bootstrap/cache
-
-      # Desplegar por FTP
-      - name: Deploy to Server
+      - name: Prepare deploy-dist folder
         if: github.ref == 'refs/heads/main'
-        uses: SamKirkland/FTP-Deploy-Action@4.0.0
+        run: |
+          rm -rf deploy-dist
+          mkdir -p deploy-dist/backend deploy-dist/frontend
+          # Copiar backend necesario
+          rsync -av --exclude='node_modules' --exclude='tests' --exclude='.env.example' --exclude='README.md' backend/ deploy-dist/backend/
+          # Copiar frontend compilado
+          rsync -av frontend/dist/ deploy-dist/frontend/
+
+      - name: Deploy to Production (FTP)
+        if: github.ref == 'refs/heads/main'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./
-          server-dir: /
-      
+          server-dir: ${{ secrets.FTP_TARGET || '/web/public' }}
+          local-dir: ./deploy-dist/
+          exclude: |
+            **/.git*
+            **/node_modules/**
+            **/tests/**
+            **/docker-compose.yml
+            **/Dockerfile*
+            **/.env.example
+            **/README.md
+            **/.github/**
+
+      - name: Run Laravel Migrations and Seeders
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cd deploy-dist/backend
+          composer install --no-dev --optimize-autoloader
+          php artisan migrate --force
+          php artisan db:seed --force
