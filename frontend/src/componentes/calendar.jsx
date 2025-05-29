@@ -72,10 +72,12 @@ export default class Calendar extends React.Component {
           borderColor: getStatusColor(event.status || event.estado),
           extendedProps: {
             ...event,
-            status: event.status || event.estado || 'programada'
+            status: event.status || event.estado || 'programada',
+            user_id: event.user_id || '',
+            notas: event.notas || event.descripcion || '',
           }
         }));
-        // console.log('Eventos formateados:', formattedEvents);
+        console.log('Eventos formateados:', formattedEvents);
         this.setState({ currentEvents: formattedEvents });
       }
     } catch (error) {
@@ -126,6 +128,7 @@ export default class Calendar extends React.Component {
             hora_cita: selectInfo.startStr.split('T')[1]?.substring(0, 5) || '',
             tipo_cita: '',
             estado: 'programada',
+            user_id: localStorage.getItem('userId'),
             notas: ''
         };
         
@@ -140,9 +143,13 @@ export default class Calendar extends React.Component {
       hora_cita: info.event.startStr.split('T')[1]?.substring(0, 5) || '',
       tipo_cita: info.event.extendedProps.tipo_cita || info.event.title || '',
       estado: info.event.extendedProps.status || info.event.extendedProps.estado || 'programada',
-      notas: info.event.extendedProps.notas || info.event.extendedProps.descripcion || ''
+      notas: info.event.extendedProps.notas || info.event.extendedProps.descripcion || '',
+      // Añadimos la mascota asociada si existe en los extendedProps
+      mascota_id: info.event.extendedProps?.historial?.mascota?.id || '',
+      // Si tienes la línea de historial, también pásala
+      linea_historial_id: info.event.extendedProps?.historial?.id || '',
+      user_id: info.event.extendedProps.user_id || '',
     };
-    // console.log('Datos del evento para el modal:', eventData);
     this.openModal('edit', eventData);
   };
 

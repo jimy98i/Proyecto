@@ -54,12 +54,39 @@ jobs:
           # Verificar que Nginx está sirviendo correctamente
           curl -I http://localhost:80
 
-      - name: Deploy to Production
+      - name: Deploy to Production (FTP)
+        if: github.ref == 'refs/heads/main'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_TARGET || '/web/public' }}
+          local-dir: ./deploy-dist/
+          exclude: |
+            **/.git*
+            **/node_modules/**
+            **/tests/**
+            **/docker-compose.yml
+            **/Dockerfile*
+            **/.env.example
+            **/README.md
+            **/.github/**
+      - name: Prepare deploy-dist folder
         if: github.ref == 'refs/heads/main'
         run: |
-          echo "Deploying to production..."
-          # Aquí puedes agregar los comandos para desplegar en tu servidor de producción
-          # Por ejemplo:
-          # - Copiar los archivos necesarios
-          # - Ejecutar docker-compose en el servidor de producción
-      
+          rm -rf deploy-dist
+          mkdir -p deploy-dist/backend deploy-dist/frontend
+          # Copiar backend necesario
+          rsync -av --exclude='node_modules' --exclude='tests' --exclude='.env.example' --exclude='README.md' backend/ deploy-dist/backend/
+          # Copiar frontend compilado
+          rsync -av frontend/dist/ deploy-dist/frontend/
+          # Copiar archivos raíz necesarios
+          cp docker-compose.yml deploy-dist/ || true
+      - name: Run Laravel Migrations and Seeders
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cd deploy-dist/backend
+          composer install --no-dev --optimize-autoloader
+          php artisan migrate --force
+          php artisan db:seed --force

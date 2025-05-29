@@ -19,7 +19,8 @@ class StoreAppointmentRequest extends FormRequest
             'hora_cita' => 'required|date_format:H:i',
             'tipo_cita' => 'nullable|string|in:consulta,revisión,urgencia,vacunación,operación',
             'estado' => 'nullable|string|in:programada,confirmada,cancelada,completada',
-            'notas' => 'required|string'
+            'notas' => 'required|string',
+            'user_id' => 'required|exists:users,id' // Aseguramos que el usuario exista
         ];
     }
 

@@ -11,7 +11,7 @@ class HistorySeeder extends Seeder
     {
         History::create([
             'id' => 1,
-            'mascota_id' => 1, // Asegúrate de que el ID de la mascota exista
+            'mascota_id' => 1,
             'fecha_creacion' => now(),
             'descripcion_cliente' => 'Consulta general',
             'estado' => 'activo',
@@ -19,7 +19,21 @@ class HistorySeeder extends Seeder
 
         History::create([
             'id' => 2,
-            'mascota_id' => 2, // Asegúrate de que el ID de la mascota exista
+            'mascota_id' => 2, 
+            'fecha_creacion' => now(),
+            'descripcion_cliente' => 'Vacunación',
+            'estado' => 'activo',
+        ]);
+        History::create([
+            'id' => 3,
+            'mascota_id' => 3,
+            'fecha_creacion' => now(),
+            'descripcion_cliente' => 'Vacunación',
+            'estado' => 'activo',
+        ]);
+        History::create([
+            'id' => 4,
+            'mascota_id' => 4,
             'fecha_creacion' => now(),
             'descripcion_cliente' => 'Vacunación',
             'estado' => 'activo',

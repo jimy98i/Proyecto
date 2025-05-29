@@ -7,6 +7,7 @@ use App\Models\HistoryLine;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use \Illuminate\Http\Exceptions\HttpResponseException;
 
 class AppointmentService
 {
@@ -128,6 +129,8 @@ class AppointmentService
 
     public function create(array $data): Appointment
     {
+        // dd($data);
+        $data['linea_historial_id'] = $data['linea_historial_id'] ?? null;
         $this->validateHistoryLine($data);
         return Appointment::create($data);
     }
@@ -206,9 +209,9 @@ class AppointmentService
             return;
         }
 
-        $historyLine = \App\Models\HistoryLine::where('id', $data['linea_historial_id'])->first();
+        $historyLine = HistoryLine::where('id', $data['linea_historial_id'])->first();
         if (!$historyLine) {
-            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+            throw new HttpResponseException(
                 response()->json([
                     'message' => 'La línea de historial especificada no existe'
                 ], 404)
@@ -217,7 +220,7 @@ class AppointmentService
 
         $history = $historyLine->history;
         if (!$history || !$history->pet) {
-            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+            throw new HttpResponseException(
                 response()->json([
                     'message' => 'La línea de historial no está asociada a ninguna mascota'
                 ], 400)

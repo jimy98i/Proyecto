@@ -42,8 +42,10 @@ const HistorialMedico = () => {
     const fetchPets = async () => {
         try {
             const response = await fetch(`${API_URL}/pet`, {
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
                 }
             });
             const data = await response.json();
@@ -57,8 +59,10 @@ const HistorialMedico = () => {
                 if (ownerId && !owners[ownerId]) {
                     try {
                         const ownerResponse = await fetch(`${API_URL}/user/${ownerId}`, {
+                            credentials: 'include',
                             headers: {
-                                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
                             }
                         });
                         const ownerData = await ownerResponse.json();

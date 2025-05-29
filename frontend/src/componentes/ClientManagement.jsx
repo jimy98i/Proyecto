@@ -15,7 +15,7 @@ const ClientManagement = () => {
         password_confirmation: '',
         telefono: '',
         direccion: '',
-        rol: 'cliente'
+        rol: ''
     });
     const [errors, setErrors] = useState({});
     const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
@@ -49,23 +49,40 @@ const ClientManagement = () => {
         e.preventDefault();
         setErrors({});
         try {
-            const response = await post('/user', {
-                ...formData,
-                rol: 'client'
-            });
-            
+            let response, data;
+            if (selectedClient) {
+                // Editar cliente existente
+                response = await put(`/user/${selectedClient.id}`, {
+                    nombre: formData.nombre,
+                    email: formData.email,
+                    telefono: formData.telefono,
+                    direccion: formData.direccion,
+                    rol: formData.rol || 'cliente',
+                });
+            } else {
+                // Crear nuevo cliente
+                response = await post('/user', {
+                    ...formData,
+                    rol: 'cliente'
+                });
+            }
             if (!response.ok) {
-                const data = await response.json();
+                data = await response.json();
                 if (data.errors) {
                     setErrors(data.errors);
                 } else {
-                    throw new Error(data.message || 'Error al crear el cliente');
+                    throw new Error(data.message || 'Error al guardar el cliente');
                 }
                 return;
             }
-
-            const data = await response.json();
-            setClients(prevClients => [...prevClients, data]);
+            data = await response.json();
+            if (selectedClient) {
+                // Actualizar cliente en la lista
+                setClients(prevClients => prevClients.map(c => c.id === data.id ? data : c));
+            } else {
+                // Agregar nuevo cliente a la lista
+                setClients(prevClients => [...prevClients, data]);
+            }
             setShowModal(false);
             setFormData({
                 nombre: '',
@@ -74,12 +91,13 @@ const ClientManagement = () => {
                 password_confirmation: '',
                 telefono: '',
                 direccion: '',
-                rol: 'cliente'
+                rol: ''
             });
+            setSelectedClient(null);
         } catch (error) {
             console.error('Error:', error);
             setErrors({
-                general: ['Error al crear el cliente. Por favor, intente nuevamente.']
+                general: ['Error al guardar el cliente. Por favor, intente nuevamente.']
             });
         }
     };
@@ -91,10 +109,8 @@ const ClientManagement = () => {
             email: client.email || '',
             telefono: client.telefono || '',
             direccion: client.direccion || '',
-            dni: client.dni || '',
             password: '',
-            password_confirmation: '',
-            rol: 'client'
+            rol: client.rol || 'cliente',
         });
         setShowModal(true);
     };
@@ -126,8 +142,7 @@ const ClientManagement = () => {
 
     const filteredClients = clients.filter(client =>
         client.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.dni?.includes(searchTerm)
+        client.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -345,4 +360,4 @@ const ClientManagement = () => {
     );
 };
 
-export default ClientManagement; 
+export default ClientManagement;

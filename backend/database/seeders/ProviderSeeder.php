@@ -23,6 +23,5 @@ class ProviderSeeder extends Seeder
             'email' => 'proveedor2@example.com',
         ]);
 
-        // Agrega más proveedores según sea necesario
     }
 } 

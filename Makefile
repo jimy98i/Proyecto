@@ -6,28 +6,15 @@ PROJECT_NAME = veterinaria
 up:
 	docker compose -f docker-compose.yml up --build
 
-up-prod:
-	docker compose -f docker-compose.prod.yml up --build -d
-
 down:
 	docker compose -f docker-compose.yml down
-
-down-prod:
-	docker compose -f docker-compose.prod.yml down
 
 restart:
 	$(MAKE) down
 	$(MAKE) up
 
-restart-prod:
-	$(MAKE) down-prod
-	$(MAKE) up-prod
-
 logs:
 	docker compose logs -f
-
-logs-prod:
-	docker compose -f docker-compose.yml logs -f
 
 # ========== SHELL EN CONTENEDORES ==========
 
@@ -73,17 +60,3 @@ npm-build:
 
 npm-clean:
 	docker compose exec frontend rm -rf node_modules dist
-
-# ========== APERTURA DE INTERFACES ==========
-
-phpmyadmin:
-	open http://localhost:8080
-
-app:
-	open http://localhost
-
-.PHONY: up up-prod down down-prod restart restart-prod logs logs-prod \
-        bash-backend bash-frontend bash-db \
-        migrate seed optimize key-generate composer-install artisan \
-        npm-install npm-dev npm-build npm-clean \
-        phpmyadmin app

@@ -10,7 +10,7 @@ class DocumentSeeder extends Seeder
     public function run()
     {
         Document::create([
-            'historial_id' => 1, // Asegúrate de que el ID del historial exista
+            'historial_id' => 1,
             'tipo_documento' => 'radiografia',
             'nombre_archivo' => 'radiografia_fido.jpg',
             'ruta_archivo' => '/documents/radiografia_fido.jpg',
@@ -19,7 +19,7 @@ class DocumentSeeder extends Seeder
         ]);
 
         Document::create([
-            'historial_id' => 2, // Asegúrate de que el ID del historial exista
+            'historial_id' => 2,
             'tipo_documento' => 'analisis',
             'nombre_archivo' => 'analisis_mittens.pdf',
             'ruta_archivo' => '/documents/analisis_mittens.pdf',

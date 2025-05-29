@@ -10,6 +10,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AppointmentConfirmedMail;
 
 class AppointmentController extends Controller
 {
@@ -22,17 +24,34 @@ class AppointmentController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $userRole = Auth::user()->role;
+        $user = Auth::user();
         
-        if ($userRole === 'cliente') {
+        if ($user->rol === 'cliente') {
             $appointments = $this->appointmentService->getClientAppointments();
+            $historyLineId = $this->appointmentService->getHistoryLineIdFromRequest();
             $formattedAppointments = $appointments->map(function ($appointment) {
                 return [
                     'id' => $appointment->id,
                     'title' => $appointment->tipo_cita,
                     'start' => $appointment->fecha_cita->format('Y-m-d') . $appointment->hora_cita,
                     'status' => $appointment->estado,
-                    'notas' => $appointment->notas
+                    'notas' => $appointment->notas,
+                    'user_id' => $appointment->user_id,
+                    'cliente' => $user->user ? [
+                        'id' => $user->id,
+                        'nombre' => $user->nombre,
+                        'email' => $user->email
+                    ] : null,
+                    'historial' => $appointment->historyLine ? [
+                        'id' => $appointment->historyLine->id,
+                        'descripcion' => $appointment->historyLine->descripcion,
+                        'fecha' => $appointment->historyLine->fecha->format('Y-m-d'),
+                        'mascota' => $appointment->historyLine->history->pet ? [
+                            'id' => $appointment->historyLine->history->pet->id,
+                            'nombre' => $appointment->historyLine->history->pet->nombre,
+                            'tipo' => $appointment->historyLine->history->pet->tipo
+                        ] : null
+                    ] : null
                 ];
             });
         } else {
@@ -43,6 +62,8 @@ class AppointmentController extends Controller
                     'title' => $appointment->tipo_cita,
                     'start' => date('Y-m-d', strtotime($appointment->fecha_cita)) . 'T' . date('H:i:s', strtotime($appointment->hora_cita)),
                     'status' => $appointment->estado,
+                    'user_id' => $appointment->user_id,
+                    'notas' => $appointment->notas,
                     'cliente' => $appointment->user ? [
                         'id' => $appointment->user->id,
                         'nombre' => $appointment->user->nombre,
@@ -67,7 +88,7 @@ class AppointmentController extends Controller
 
     public function getUpcoming(): JsonResponse
     {
-        $userRole = Auth::user()->role;
+        $userRole = Auth::user()->rol;
         
         if ($userRole === 'cliente') {
             $appointments = $this->appointmentService->getClientUpcomingAppointments();
@@ -112,7 +133,7 @@ class AppointmentController extends Controller
 
     public function getPast(): JsonResponse
     {
-        $userRole = Auth::user()->role;
+        $userRole = Auth::user()->rol;
         
         if ($userRole === 'cliente') {
             $appointments = $this->appointmentService->getClientPastAppointments();
@@ -157,6 +178,7 @@ class AppointmentController extends Controller
 
     public function store(StoreAppointmentRequest $request): JsonResponse
     {
+        // dd($request->all());
         $appointment = $this->appointmentService->create($request->validated());
         return response()->json($appointment, 201);
     }
@@ -169,7 +191,24 @@ class AppointmentController extends Controller
 
     public function update(UpdateAppointmentRequest $request, Appointment $appointment): JsonResponse
     {
-        $this->appointmentService->update($appointment, $request->validated());
+        $oldStatus = $appointment->estado;
+        $appointment->fill($request->all());
+        $appointment->save();
+
+        dd($appointment->toArray());
+        // Si el estado cambió de programada a confirmada
+        if ($oldStatus === 'programada' && $appointment->estado === 'confirmada') {
+            $user = $appointment->user; // Relación user en el modelo Appointment
+            if ($user && $user->email) {
+                \Log::info('Intentando enviar correo de confirmación', [
+                    'user_email' => $user->email,
+                    'appointment_id' => $appointment->id
+                ]);
+                Mail::to($user->email)->send(new AppointmentConfirmedMail($appointment, $user));
+                \Log::info('Correo de confirmación enviado');
+            }
+        }
+
         return response()->json($appointment);
     }
 

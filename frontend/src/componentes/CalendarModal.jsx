@@ -15,6 +15,7 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
     mascota_id: '',
     user_id: localStorage.getItem('user_id') || ''
   });
+
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [historyLines, setHistoryLines] = useState([]);
   const [pets, setPets] = useState([]);
@@ -39,32 +40,26 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
       }
 
       setFormData({
-          id: initialData.id || '',
-          fecha_cita: initialData.fecha_cita || '',
-          hora_cita: initialData.hora_cita || '',
-          tipo_cita: initialData.tipo_cita || initialData.title || '',
-          estado: initialData.estado || 'programada',
-          notas: initialData.notas || initialData.descripcion || '',
-          linea_historial_id: initialData.linea_historial_id || '',
-          mascota_id: initialData.mascota_id || '',
-          user_id: initialData.user_id || localStorage.getItem('user_id') || ''
+        id: initialData.id || '',
+        fecha_cita: initialData.fecha_cita || '',
+        hora_cita: initialData.hora_cita || '',
+        tipo_cita: initialData.tipo_cita || initialData.title || '',
+        estado: initialData.estado || 'programada',
+        notas: initialData.notas || initialData.descripcion || '',
+        linea_historial_id: initialData.historial?.id || initialData.linea_historial_id || '',
+        mascota_id: initialData.mascota_id || '',
+        user_id: initialData.user_id || localStorage.getItem('userId') || ''
       });
-      
-      // Si hay una mascota en los datos iniciales, cargar sus líneas de historial
-      if (initialData.mascota_id) {
-        fetchHistoryLines(initialData.mascota_id);
-        // Buscar la mascota en el array de mascotas y establecerla como seleccionada
-        const pet = pets.find(pet => pet.id === parseInt(initialData.mascota_id));
+
+      // Si hay una mascota, cargar sus líneas de historial
+      const mascotaId = initialData.mascota_id || '';
+      if (mascotaId) {
+        fetchHistoryLines(mascotaId);
+        const pet = pets.find(p => p.id === parseInt(mascotaId));
         if (pet) {
           setSelectedPet(pet);
         }
       }
-    } else {
-      // Si es una nueva cita, asegurarnos de que tenga el user_id actual
-      setFormData(prev => ({
-        ...prev,
-        user_id: localStorage.getItem('user_id') || ''
-      }));
     }
   }, [initialData, pets]);
 
@@ -295,7 +290,7 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
     try {
       // Asegurarnos de que el user_id esté presente
       if (!formData.user_id) {
-        formData.user_id = localStorage.getItem('user_id');
+        formData.user_id = localStorage.getItem('userId');
       }
 
       // Si no hay una línea de historial seleccionada, creamos una nueva
@@ -497,22 +492,6 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
             ) : (
               // Formulario para administradores
               <>
-                <Form.Group className="mb-3" controlId="formMascota">
-                  <Form.Label>Mascota</Form.Label>
-                  <Form.Select
-                    name="mascota_id"
-                    value={formData.mascota_id || ''}
-                    onChange={handlePetChange}
-                    required
-                  >
-                    <option value="">Seleccione una mascota</option>
-                    {pets.map((pet) => (
-                      <option key={pet.id} value={pet.id}>
-                        {pet.nombre} ({pet.tipo})
-                      </option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
                 {formData.mascota_id && (
                   <Form.Group className="mb-3" controlId="formHistoryLine">
                     <Form.Label>Línea de Historial</Form.Label>

@@ -6,7 +6,7 @@ export const fetchAppointments = async () => {
         
         // Obtener el JSON de la respuesta
         const appointments = await response.json();
-
+        console.log('Citas obtenidas:', appointments);
         // Asegurarnos de que appointments es un array
         if (!Array.isArray(appointments)) {
             console.error('La respuesta no es un array:', appointments);
@@ -23,8 +23,10 @@ export const fetchAppointments = async () => {
                 status: appointment.status,
                 notas: appointment.notas,
                 cliente: appointment.cliente,
-                historial: appointment.historial
+                historial: appointment.historial,
+                user_id: appointment.user_id || null,
             };
+            console.log('Evento mapeado:', event);
             return event;
         });
 
