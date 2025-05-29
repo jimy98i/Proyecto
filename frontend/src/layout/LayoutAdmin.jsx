@@ -42,10 +42,12 @@ const LayoutAdmin = () => {
                 >
                     <FaBars />
                 </Button>
-                <Navbar.Brand className="ms-3">{activeSection.toUpperCase()}</Navbar.Brand>
-                <Navbar.Collapse className="justify-content-end">
-                    <Navbar.Text className="me-3">{userName}</Navbar.Text>
+                <div className="d-flex align-items-center">
+                    <Navbar.Brand className="ms-3">{activeSection.toUpperCase()}</Navbar.Brand>
                     <NotificationBell />
+                </div>
+                <Navbar.Collapse className="justify-content-end d-none d-lg-flex">
+                    <Navbar.Text className="me-3">{userName}</Navbar.Text>
                     <Button variant="outline-light" onClick={logout} className="ms-3">
                         Cerrar Sesión
                     </Button>
@@ -57,13 +59,23 @@ const LayoutAdmin = () => {
                     <Offcanvas.Title>NOMBRE EMPRESA</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
-                    <Nav className="flex-column">
-                        <Nav.Link onClick={() => { setActiveSection("consultas"); setShowSidebar(false); }}>CONSULTAS</Nav.Link>
-                        <Nav.Link onClick={() => { setActiveSection("citas"); setShowSidebar(false); }}>CITAS</Nav.Link>
-                        <Nav.Link onClick={() => { setActiveSection("clientes"); setShowSidebar(false); }}>CLIENTES</Nav.Link>
-                        <Nav.Link onClick={() => { setActiveSection("empleados"); setShowSidebar(false); }}>EMPLEADOS</Nav.Link>
-                        <Nav.Link onClick={() => { setActiveSection("historial-medico"); setShowSidebar(false); }}>HISTORIAL MÉDICO</Nav.Link>
-                    </Nav>
+                    <div className="d-flex flex-column h-100">
+                        <Nav className="flex-column mb-auto">
+                            <Nav.Link onClick={() => { setActiveSection("consultas"); setShowSidebar(false); }}>CONSULTAS</Nav.Link>
+                            <Nav.Link onClick={() => { setActiveSection("citas"); setShowSidebar(false); }}>CITAS</Nav.Link>
+                            <Nav.Link onClick={() => { setActiveSection("clientes"); setShowSidebar(false); }}>CLIENTES</Nav.Link>
+                            <Nav.Link onClick={() => { setActiveSection("empleados"); setShowSidebar(false); }}>EMPLEADOS</Nav.Link>
+                            <Nav.Link onClick={() => { setActiveSection("historial-medico"); setShowSidebar(false); }}>HISTORIAL MÉDICO</Nav.Link>
+                        </Nav>
+                        <div className="mt-auto border-top pt-3">
+                            <div className="d-flex align-items-center mb-3">
+                                <span className="text-muted me-3">{userName}</span>
+                            </div>
+                            <Button variant="outline-danger" onClick={logout} className="w-100">
+                                Cerrar Sesión
+                            </Button>
+                        </div>
+                    </div>
                 </Offcanvas.Body>
             </Offcanvas>
 

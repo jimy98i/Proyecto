@@ -34,7 +34,7 @@ class History extends Model
 
     public function appointments()
     {
-        return $this->hasMany(Appointment::class, 'historial_id');
+        return $this->hasManyThrough(Appointment::class, HistoryLine::class, 'historial_id', 'linea_historial_id');
     }
 
     public function documents()

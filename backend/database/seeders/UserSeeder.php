@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
             'id' => 1,
             'nombre' => 'Admin User',
             'email' => 'admin@example.com',
-            'password' => bcrypt('password'), // Asegúrate de encriptar la contraseña
+            'password' => bcrypt('password'),
             'telefono' => '123456789',
             'direccion' => 'Calle Admin 123',
             'rol' => 'admin',
@@ -33,6 +33,33 @@ class UserSeeder extends Seeder
             'id' => 3,
             'nombre' => 'Client User',
             'email' => 'client@example.com',
+            'password' => bcrypt('password'),
+            'telefono' => '555555555',
+            'direccion' => 'Calle Cliente 789',
+            'rol' => 'cliente',
+        ]);
+        User::create([
+            'id' => 4,
+            'nombre' => 'Client User2',
+            'email' => 'client2@example.com',
+            'password' => bcrypt('password'),
+            'telefono' => '555555555',
+            'direccion' => 'Calle Cliente 789',
+            'rol' => 'cliente',
+        ]);
+        User::create([
+            'id' => 5,
+            'nombre' => 'Client User3',
+            'email' => 'client3@example.com',
+            'password' => bcrypt('password'),
+            'telefono' => '555555555',
+            'direccion' => 'Calle Cliente 789',
+            'rol' => 'cliente',
+        ]);
+        User::create([
+            'id' => 6,
+            'nombre' => 'Client User4',
+            'email' => 'client4@example.com',
             'password' => bcrypt('password'),
             'telefono' => '555555555',
             'direccion' => 'Calle Cliente 789',

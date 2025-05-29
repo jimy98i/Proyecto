@@ -23,10 +23,10 @@
 }
 
 /* Fondo del Navbar */
-.navbar-dark {
-    background-color: #1a252f !important; /* Azul marino más oscuro */
-    height: auto; /* Ajustar altura automáticamente */
-    padding: 0.5rem 1rem; /* Reducir el padding */
+.header {
+    background-color: #1a252f !important;
+    height: auto;
+    padding: 0.5rem 1rem;
 }
 
 /* Botón de las tres barras */
@@ -38,6 +38,66 @@
 .btn-outline-light:hover {
     background-color: #34495e;
     color: #ffffff;
+}
+
+/* Estilos para el Offcanvas */
+.offcanvas {
+    background-color: #1a252f;
+    color: #ecf0f1;
+}
+
+.offcanvas-header {
+    border-bottom: 1px solid #34495e;
+}
+
+.offcanvas-title {
+    color: #ecf0f1;
+}
+
+.offcanvas-body .nav-link {
+    color: #ecf0f1;
+    padding: 0.8rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.offcanvas-body .nav-link:hover {
+    background-color: #34495e;
+    color: #ffffff;
+}
+
+/* Estilos para el menú móvil */
+@media (max-width: 768px) {
+    .header {
+        padding: 0.5rem;
+    }
+
+    .offcanvas-body {
+        padding: 1rem;
+    }
+
+    .offcanvas-body .nav-link {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .offcanvas-body .btn {
+        margin-top: 0.5rem;
+    }
+
+    .offcanvas-body .text-muted {
+        color: #bdc3c7 !important;
+    }
+}
+
+/* Estilos para tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .header {
+        padding: 0.7rem 1rem;
+    }
+
+    .offcanvas-body .nav-link {
+        padding: 0.7rem 1rem;
+    }
 }
 
 /* Títulos y textos */
@@ -161,6 +221,16 @@ p {
     padding: 1rem;
 }
 
+.sidebar-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.sidebar-header h5 {
+    color: #ecf0f1;
+    margin: 0;
+}
+
 .sidebar .logo {
     font-size: 1.5rem;
     font-weight: bold;
@@ -193,6 +263,15 @@ p {
     padding: 0.5rem 1rem;
 }
 
+.header .d-flex {
+    gap: 1rem;
+}
+
+.header .navbar-brand {
+    margin-right: 0;
+    font-size: 1.2rem;
+}
+
 .header h1 {
     margin: 0;
     font-size: 1.5rem;
@@ -218,7 +297,7 @@ p {
     background-color: #1a252f; /* Azul oscuro */
     color: #ecf0f1;
     text-align: center;
-    padding: 0rem 0;
+    padding: 0.5rem 0;
     font-size: 0.8rem;
 }
 
@@ -238,6 +317,40 @@ p {
     }
 
     .header {
-        justify-content: center;
+        justify-content: space-between;
     }
+
+    .header {
+        padding: 0.5rem;
+    }
+
+    .header .navbar-brand {
+        font-size: 1rem;
+    }
+
+    .header .d-flex {
+        gap: 0.5rem;
+    }
+}
+
+/* Estilos para la campana de notificaciones */
+.bell-button {
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    background-color: #34495e !important;
+    border-color: #34495e !important;
+    color: #ecf0f1 !important;
+}
+
+.bell-button:hover {
+    background-color: #2c3e50 !important;
+    border-color: #2c3e50 !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.bell-button .badge {
+    transform: translate(-50%, -50%);
 }

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { initializeCsrf, post, get } from '../utils/api';
 
 const AuthContext = createContext(null);
@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem('access_token'));
     const [profileImage, setProfileImage] = useState(null);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const API_URL = import.meta.env.VITE_API_URL;
 
@@ -28,6 +29,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('isAuthenticated');
         localStorage.removeItem('userId');
         localStorage.removeItem('profile_image');
+        localStorage.removeItem('user_data');
         setIsAuthenticated(false);
         setUserName('');
         setUserRole('');
@@ -69,6 +71,15 @@ export const AuthProvider = ({ children }) => {
             setUserRole(storedUserRole || '');
             setUserEmail(storedUserEmail || '');
             setUserId(storedUserId);
+
+            // Redirigir según el rol si estamos en la página principal
+            if (location.pathname === '/') {
+                if (storedUserRole === 'admin') {
+                    navigate('/admin');
+                } else if (storedUserRole === 'cliente') {
+                    navigate('/client');
+                }
+            }
         }
     };
 
@@ -112,7 +123,7 @@ export const AuthProvider = ({ children }) => {
             if (inactivityTimer) clearTimeout(inactivityTimer);
             clearInterval(tokenCheckInterval);
         };
-    }, []);
+    }, [location.pathname]); // Añadido location.pathname como dependencia
 
     useEffect(() => {
         if (token) {

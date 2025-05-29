@@ -16,7 +16,8 @@ class Appointment extends Model
         'hora_cita',
         'tipo_cita',
         'estado',
-        'notas'
+        'notas',
+        'user_id'
     ];
 
     protected $casts = [

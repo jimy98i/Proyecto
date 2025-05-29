@@ -40,12 +40,22 @@ export default class Calendar extends React.Component {
       modalData: { title: '', start: '', end: '', allDay: false }, // Datos iniciales del modal
       modalAction: null, // Acción actual (crear, editar, etc.)
       pendingAppointments: [],
-      showHelp: false
+      showHelp: false,
+      isMobile: window.innerWidth <= 768
     }
   }
 
   componentDidMount() {
     this.loadEvents();
+    window.addEventListener('resize', this.handleResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
+  }
+
+  handleResize = () => {
+    this.setState({ isMobile: window.innerWidth <= 768 });
   }
 
   loadEvents = async () => {
@@ -62,10 +72,12 @@ export default class Calendar extends React.Component {
           borderColor: getStatusColor(event.status || event.estado),
           extendedProps: {
             ...event,
-            status: event.status || event.estado || 'programada'
+            status: event.status || event.estado || 'programada',
+            user_id: event.user_id || '',
+            notas: event.notas || event.descripcion || '',
           }
         }));
-        // console.log('Eventos formateados:', formattedEvents);
+        console.log('Eventos formateados:', formattedEvents);
         this.setState({ currentEvents: formattedEvents });
       }
     } catch (error) {
@@ -97,15 +109,30 @@ export default class Calendar extends React.Component {
   };
 
   handleDateSelect = (selectInfo) => {
-    const eventData = {
-      fecha_cita: selectInfo.startStr.split('T')[0],
-      hora_cita: selectInfo.startStr.split('T')[1]?.substring(0, 5) || '',
-      tipo_cita: '',
-      estado: 'programada',
-      notas: ''
-    };
-    // console.log('Datos para nueva cita:', eventData);
-    this.openModal('create', eventData);
+        // Obtener la fecha actual sin la hora
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Convertir la fecha seleccionada a objeto Date
+        const selectedDate = new Date(selectInfo.startStr);
+        selectedDate.setHours(0, 0, 0, 0);
+        
+        // Comparar las fechas
+        if (selectedDate < today) {
+            alert('No puedes seleccionar una fecha anterior a hoy');
+            return;
+        }
+    
+        const eventData = {
+            fecha_cita: selectInfo.startStr.split('T')[0],
+            hora_cita: selectInfo.startStr.split('T')[1]?.substring(0, 5) || '',
+            tipo_cita: '',
+            estado: 'programada',
+            user_id: localStorage.getItem('userId'),
+            notas: ''
+        };
+        
+        this.openModal('create', eventData);
   };
 
   handleEventClick = (info) => {
@@ -116,9 +143,13 @@ export default class Calendar extends React.Component {
       hora_cita: info.event.startStr.split('T')[1]?.substring(0, 5) || '',
       tipo_cita: info.event.extendedProps.tipo_cita || info.event.title || '',
       estado: info.event.extendedProps.status || info.event.extendedProps.estado || 'programada',
-      notas: info.event.extendedProps.notas || info.event.extendedProps.descripcion || ''
+      notas: info.event.extendedProps.notas || info.event.extendedProps.descripcion || '',
+      // Añadimos la mascota asociada si existe en los extendedProps
+      mascota_id: info.event.extendedProps?.historial?.mascota?.id || '',
+      // Si tienes la línea de historial, también pásala
+      linea_historial_id: info.event.extendedProps?.historial?.id || '',
+      user_id: info.event.extendedProps.user_id || '',
     };
-    // console.log('Datos del evento para el modal:', eventData);
     this.openModal('edit', eventData);
   };
 
@@ -158,10 +189,11 @@ export default class Calendar extends React.Component {
 
   render() {
     const isAdmin = localStorage.getItem('userRole') === 'admin';
+    const { isMobile } = this.state;
     
     return (
       <div className='demo-app'>
-        {this.renderSidebar()}
+        {!isMobile && this.renderSidebar()}
         <div className='demo-app-main'>
           <div className="calendar-container">
             <div className="calendar-controls">
@@ -176,16 +208,18 @@ export default class Calendar extends React.Component {
                 ref={this.calendarRef}
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 headerToolbar={{
-                  left: 'prev,next today',
+                  left: isMobile ? 'prev,next' : 'prev,next today',
                   center: 'title',
-                  right: isAdmin ? 'dayGridMonth,timeGridWeek,timeGridDay' : 'timeGridWeek'
+                  right: isAdmin 
+                    ? (isMobile ? 'dayGridMonth,timeGridDay' : 'dayGridMonth,timeGridWeek,timeGridDay')
+                    : (isMobile ? 'timeGridDay' : 'timeGridWeek')
                 }}
-                initialView={isAdmin ? 'dayGridMonth' : 'timeGridWeek'}
+                initialView={isMobile ? 'timeGridDay' : (isAdmin ? 'dayGridMonth' : 'timeGridWeek')}
                 editable={true}
                 allDaySlot={false}
                 selectable={true}
                 selectMirror={true}
-                dayMaxEvents={true}
+                dayMaxEvents={!isMobile}
                 weekends={this.state.weekendsVisible}
                 events={this.state.currentEvents}
                 select={this.handleDateSelect}
@@ -193,6 +227,21 @@ export default class Calendar extends React.Component {
                 eventChange={this.handleEventChange}
                 eventDisplay="block"
                 eventTimeFormat={{
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: false
+                }}
+                height={isMobile ? 'auto' : 'auto'}
+                contentHeight={isMobile ? 'auto' : 'auto'}
+                aspectRatio={isMobile ? 1.35 : 1.5}
+                expandRows={isMobile}
+                stickyHeaderDates={true}
+                nowIndicator={true}
+                slotMinTime="09:00:00"
+                slotMaxTime="21:00:00"
+                slotDuration="00:30:00"
+                slotLabelInterval="01:00"
+                slotLabelFormat={{
                   hour: '2-digit',
                   minute: '2-digit',
                   hour12: false
@@ -221,8 +270,9 @@ export default class Calendar extends React.Component {
 
   renderSidebar() {
     const userRole = localStorage.getItem('userRole');
+    const { isMobile } = this.state;
 
-    if (userRole !== 'admin') {
+    if (userRole !== 'admin' || isMobile) {
       return null;
     }
 

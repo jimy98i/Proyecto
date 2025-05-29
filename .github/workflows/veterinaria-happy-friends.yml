@@ -34,6 +34,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           rm -rf deploy-dist
+
           mkdir -p deploy-dist/backend
           # Copiar backend necesario
           rsync -av --exclude='node_modules' --exclude='tests' --exclude='.env.example' --exclude='README.md' backend/ deploy-dist/backend/
