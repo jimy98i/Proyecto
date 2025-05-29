@@ -37,8 +37,8 @@ jobs:
           mkdir -p deploy-dist/backend deploy-dist/frontend
           # Copiar backend necesario
           rsync -av --exclude='node_modules' --exclude='tests' --exclude='.env.example' --exclude='README.md' backend/ deploy-dist/backend/
-          # Copiar frontend compilado
-          rsync -av frontend/dist/ deploy-dist/frontend/
+          # Copiar frontend compilado (ajustado a la salida real de Vite)
+          rsync -av backend/public/build/ deploy-dist/frontend/
 
       - name: Debug frontend build
         run: |
