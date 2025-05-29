@@ -34,11 +34,13 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           rm -rf deploy-dist
-          mkdir -p deploy-dist/backend deploy-dist/frontend
+          mkdir -p deploy-dist/backend
           # Copiar backend necesario
           rsync -av --exclude='node_modules' --exclude='tests' --exclude='.env.example' --exclude='README.md' backend/ deploy-dist/backend/
-          # Copiar frontend compilado (ajustado a la salida real de Vite)
-          rsync -av backend/public/build/ deploy-dist/frontend/
+          # Copiar build del frontend dentro de la carpeta pública del backend
+          rm -rf deploy-dist/backend/public/build
+          mkdir -p deploy-dist/backend/public/build
+          rsync -av backend/public/build/ deploy-dist/backend/public/build/
 
       - name: Debug frontend build
         run: |
@@ -53,7 +55,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ${{ secrets.FTP_TARGET || '/web/public/' }}
-          local-dir: ./deploy-dist/
+          local-dir: ./deploy-dist/backend/
           exclude: |
             **/.git*
             **/node_modules/**
