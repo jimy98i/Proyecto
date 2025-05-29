@@ -90,7 +90,7 @@ El entorno de desarrollo está compuesto por los siguientes servicios:
 - **Motor**: MySQL.
 - **Gestión**:
   - phpMyAdmin para administración visual.
-  - Scripts de inicialización en `database/init.sql`.
+  - Scripts de inicialización en `backend/database/init.sql`.
 
 ---
 
