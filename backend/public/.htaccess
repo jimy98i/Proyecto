@@ -13,13 +13,22 @@
     RewriteCond %{HTTP:x-xsrf-token} .
     RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
+    # Redirigir rutas de la API a Laravel (ajusta si tu API está en /api)
+    RewriteCond %{REQUEST_URI} ^/api/
+    RewriteRule ^api/(.*)$ index.php [L]
+
+    # Servir los assets generados por Vite correctamente
+    RewriteCond %{REQUEST_URI} ^/assets/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^assets/(.*)$ public/assets/$1 [L]
+
+    # Redirigir todo lo que no sea un archivo real a index.html (SPA React)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.html [L]
+
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
-
-    # Send Requests To Front Controller...
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^ index.php [L]
 </IfModule>
