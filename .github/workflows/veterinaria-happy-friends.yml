@@ -45,6 +45,18 @@ jobs:
           echo "Contenido de backend/public/build tras el build de Vite:"
           ls -l backend/public/build || echo "No existe backend/public/build"
 
+      - name: Check Vite build output
+        run: |
+          if [ ! -f frontend/dist/index.html ]; then
+            echo "ERROR: El build de Vite no generó index.html en frontend/dist."
+            exit 1
+          fi
+          if [ ! -d frontend/dist/assets ]; then
+            echo "ERROR: El build de Vite no generó la carpeta de assets en frontend/dist."
+            exit 1
+          fi
+          echo "Build de Vite generado correctamente."
+
       - name: Deploy to Production (FTP)
         if: github.ref == 'refs/heads/main'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4

@@ -5,31 +5,24 @@
 
     RewriteEngine On
 
-    # Handle Authorization Header
-    RewriteCond %{HTTP:Authorization} .
-    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    # Redirigir www a sin www y forzar HTTPS (si el hosting lo permite)
+    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-    # Handle X-XSRF-Token Header
-    RewriteCond %{HTTP:x-xsrf-token} .
-    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
+    # Permitir acceso a archivos estáticos y de entrada
+    <FilesMatch "\.(html|php|js|css|svg|png|jpg|jpeg|gif|ico|json|txt|woff|woff2|ttf|eot|map)$">
+        Require all granted
+    </FilesMatch>
 
-    # Redirigir rutas de la API a Laravel (ajusta si tu API está en /api)
+    # Redirigir rutas de la API a Laravel
     RewriteCond %{REQUEST_URI} ^/api/
     RewriteRule ^api/(.*)$ index.php [L]
 
-    # Servir los assets generados por Vite correctamente
-    RewriteCond %{REQUEST_URI} ^/assets/
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^assets/(.*)$ public/assets/$1 [L]
-
-    # Redirigir todo lo que no sea un archivo real a index.html (SPA React)
+    # Redirigir todo lo que no sea archivo o carpeta real a index.html (SPA React)
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^ index.html [L]
-
-    # Redirect Trailing Slashes If Not A Folder...
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_URI} (.+)/$
-    RewriteRule ^ %1 [L,R=301]
 </IfModule>
 
