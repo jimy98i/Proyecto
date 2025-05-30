@@ -15,35 +15,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Build Frontend and Backend
+      - name: Build Frontend (Vite)
         run: |
-          # Construir el frontend (React + Vite)
           cd frontend
           npm install
           npm run build
           cd ..
-          # Construir el backend (Laravel)
-          cd backend
-          composer install --no-dev --optimize-autoloader
-          php artisan config:cache
-          php artisan route:cache
-          php artisan view:cache
-          cd ..
-
-      - name: Prepare deploy-dist folder
-        if: github.ref == 'refs/heads/main'
-        run: |
-          rm -rf deploy-dist
-          mkdir -p deploy-dist/backend
-          # Copiar backend necesario
-          rsync -av --exclude='node_modules' --exclude='tests' --exclude='.env.example' --exclude='README.md' backend/ deploy-dist/backend/
-          # Copiar todo el build del frontend (incluyendo index.html y assets) a la carpeta pública del backend
-          rsync -av frontend/dist/ deploy-dist/backend/public/
-
-      - name: Debug frontend build
-        run: |
-          echo "Contenido de backend/public/build tras el build de Vite:"
-          ls -l backend/public/build || echo "No existe backend/public/build"
 
       - name: Check Vite build output
         run: |
@@ -57,29 +34,17 @@ jobs:
           fi
           echo "Build de Vite generado correctamente."
 
-      - name: Deploy to Production (FTP)
-        if: github.ref == 'refs/heads/main'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_TARGET || '/web/public/' }}
-          local-dir: ./deploy-dist/backend/
-          exclude: |
-            **/.git*
-            **/node_modules/**
-            **/tests/**
-            **/docker-compose.yml
-            **/Dockerfile*
-            **/.env.example
-            **/README.md
-            **/.github/**
-
-      - name: Run Laravel Migrations and Seeders
-        if: github.ref == 'refs/heads/main'
+      - name: Prepare deploy-dist folder
         run: |
-          cd deploy-dist/backend
-          composer install --no-dev --optimize-autoloader
-          php artisan migrate --force
-          php artisan db:seed --force
+          rm -rf deploy-dist
+          mkdir -p deploy-dist/backend
+          # Copiar backend necesario
+          rsync -av --exclude='node_modules' --exclude='tests' --exclude='.env.example' --exclude='README.md' backend/ deploy-dist/backend/
+          # Copiar todo el build del frontend (incluyendo index.html y assets) a la carpeta pública del backend
+          rsync -av frontend/dist/ deploy-dist/backend/public/
+
+      - name: Deploy to Private Deploy Folder
+        run: |
+          rm -rf /deploy/236_Proyecto_main/*
+          cp -r deploy-dist/backend/* /deploy/236_Proyecto_main/
+          echo "Despliegue realizado en /deploy/236_Proyecto_main."
