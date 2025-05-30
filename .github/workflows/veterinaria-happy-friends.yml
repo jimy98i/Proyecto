@@ -38,9 +38,11 @@ jobs:
       - name: Prepare deploy-dist folder
         run: |
           rm -rf deploy-dist
-          mkdir -p deploy-dist/frontend
-          # Copiar build del frontend (incluyendo index.html y assets) a deploy-dist/frontend
-          rsync -av frontend/dist/ deploy-dist/frontend/
+          mkdir -p deploy-dist/backend/public
+          # Copiar backend necesario
+          rsync -av --exclude='node_modules' --exclude='tests' --exclude='.env.example' --exclude='README.md' backend/ deploy-dist/backend/
+          # Copiar build del frontend (incluyendo index.html y assets) a la carpeta pública del backend
+          rsync -av frontend/dist/ deploy-dist/backend/public/
 
       - name: Deploy to Production (FTP)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -48,8 +50,8 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /deploy/236_Proyecto_main/frontend/
-          local-dir: ./deploy-dist/frontend/
+          server-dir: /deploy/236_Proyecto_main/
+          local-dir: ./deploy-dist/backend/
           exclude: |
             **/.git*
             **/node_modules/**
