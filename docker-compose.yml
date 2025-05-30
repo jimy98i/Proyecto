@@ -47,7 +47,7 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
     volumes:
-      - database:/var/lib/mysql
+      - database/bd:/var/lib/mysql
     networks:
       - app-network
   phpmyadmin:
@@ -63,9 +63,7 @@ services:
       - mysql
     networks:
       - app-network
-volumes:
-  database:
 
 networks:
   app-network:
-    driver: bridge 
+    driver: bridge
