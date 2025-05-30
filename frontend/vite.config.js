@@ -9,7 +9,7 @@ export default defineConfig({
   ],
   base: '/',
   build: {
-    outDir: '../public/build', // Este es el directorio de salida que se copiará en la carpeta public de Laravel
+    outDir: 'dist', // Generar el build en frontend/dist
     emptyOutDir: true, // Vaciar la carpeta build antes de crear nuevos archivos
   },
   assetsInclude: ['**/*.tiff'],
