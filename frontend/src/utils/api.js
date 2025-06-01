@@ -52,6 +52,13 @@ export const fetchApi = async (endpoint, options = {}) => {
         defaultHeaders['Authorization'] = `Bearer ${token}`;
     }
 
+    // Si el hosting requiere autenticación básica, añade el header Authorization
+    const basicUser = import.meta.env.VITE_API_BASIC_USER;
+    const basicPass = import.meta.env.VITE_API_BASIC_PASS;
+    if (basicUser && basicPass) {
+        defaultHeaders['Authorization'] = 'Basic ' + btoa(`${basicUser}:${basicPass}`);
+    }
+
     const config = {
         ...options,
         credentials: 'include',
@@ -67,13 +74,11 @@ export const fetchApi = async (endpoint, options = {}) => {
 
     try {
         const response = await fetch(`${API_URL}${endpoint}`, config);
-        
         if (response.status === 419) { // CSRF token mismatch
             await initializeCsrf();
             // Reintentar la petición una vez
             return fetchApi(endpoint, options);
         }
-
         return response;
     } catch (error) {
         console.error('Error en la petición:', error);
@@ -96,4 +101,4 @@ export const put = (endpoint, data, options = {}) => {
 
 export const del = (endpoint, options = {}) => {
     return fetchApi(endpoint, { ...options, method: 'DELETE' });
-}; 
+};
