@@ -61,7 +61,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: http://veterinariahappyfriends.com/web/
+          server-dir: /home/veterinariahappyfriends.com/web/
           local-dir: ./deploy-dist/web/
           exclude: |
             **/.git*
