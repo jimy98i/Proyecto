@@ -72,3 +72,5 @@ jobs:
             **/.env.example
             **/README.md
             **/.github/**
+            **/public/index.php
+            **/public/.htaccess
