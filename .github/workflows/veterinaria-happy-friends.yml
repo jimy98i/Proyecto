@@ -53,11 +53,7 @@ jobs:
           # Copiar backend necesario
           rsync -av --exclude='node_modules' --exclude='tests' --exclude='.env.example' --exclude='README.md' backend/ deploy-dist/backend/
           # Copiar build del frontend (incluyendo index.html y assets) a la carpeta pública del backend
-          rsync -av frontend/dist/ deploy-dist/backend/
-
-      - name: Crear carpeta assets vacía si no existe
-        run: |
-          mkdir -p frontend/dist/assets
+          rsync -av frontend/dist/ deploy-dist/backend/public/
 
       - name: Deploy to Production (FTP)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
