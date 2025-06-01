@@ -49,18 +49,20 @@ jobs:
       - name: Prepare deploy-dist folder
         run: |
           rm -rf deploy-dist
-          mkdir -p deploy-dist/frontend
-          # Copiar solo el build del frontend a deploy-dist/frontend
-          rsync -av frontend/dist/ deploy-dist/frontend/
+          mkdir -p deploy-dist/web
+          # Copiar todo el backend (excepto node_modules, tests, etc) a deploy-dist/web
+          rsync -av --exclude='node_modules' --exclude='tests' --exclude='.env.example' --exclude='README.md' backend/ deploy-dist/web/
+          # Copiar el build del frontend (incluyendo index.html y assets) a deploy-dist/web/
+          rsync -av frontend/dist/ deploy-dist/web/
 
-      - name: Deploy frontend build to Production (FTP)
+      - name: Deploy backend + frontend build to Production (FTP)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /web/
-          local-dir: ./deploy-dist/frontend/
+          server-dir: /home/veterinariahappyfriends.com/web/
+          local-dir: ./deploy-dist/web/
           exclude: |
             **/.git*
             **/node_modules/**
