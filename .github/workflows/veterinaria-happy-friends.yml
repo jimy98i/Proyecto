@@ -15,44 +15,42 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Build Frontend and Backend
+      - name: Build Frontend (Vite)
         run: |
-          # Construir el frontend (React + Vite)
           cd frontend
           npm install
           npm run build
           cd ..
-          # Construir el backend (Laravel)
-          cd backend
-          composer install --no-dev --optimize-autoloader
-          php artisan config:cache
-          php artisan route:cache
-          php artisan view:cache
-          cd ..
+
+      - name: Check Vite build output
+        run: |
+          if [ ! -f frontend/dist/index.html ]; then
+            echo "ERROR: El build de Vite no generó index.html en frontend/dist."
+            exit 1
+          fi
+          # Si no existe la carpeta assets, crearla vacía para evitar error FTP
+          if [ ! -d frontend/dist/assets ]; then
+            echo "La carpeta assets no existe, se creará vacía."
+            mkdir -p frontend/dist/assets
+          fi
+          echo "Build de Vite generado correctamente."
 
       - name: Prepare deploy-dist folder
-        if: github.ref == 'refs/heads/main'
         run: |
           rm -rf deploy-dist
-          mkdir -p deploy-dist/backend
+          mkdir -p deploy-dist/backend/public
           # Copiar backend necesario
           rsync -av --exclude='node_modules' --exclude='tests' --exclude='.env.example' --exclude='README.md' backend/ deploy-dist/backend/
-          # Copiar todo el build del frontend (incluyendo index.html y assets) a la carpeta pública del backend
+          # Copiar build del frontend (incluyendo index.html y assets) a la carpeta pública del backend
           rsync -av frontend/dist/ deploy-dist/backend/public/
 
-      - name: Debug frontend build
-        run: |
-          echo "Contenido de backend/public/build tras el build de Vite:"
-          ls -l backend/public/build || echo "No existe backend/public/build"
-
       - name: Deploy to Production (FTP)
-        if: github.ref == 'refs/heads/main'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_TARGET || '/web/public/' }}
+          server-dir: /deploy/236_Proyecto_main/
           local-dir: ./deploy-dist/backend/
           exclude: |
             **/.git*
@@ -63,11 +61,3 @@ jobs:
             **/.env.example
             **/README.md
             **/.github/**
-
-      - name: Run Laravel Migrations and Seeders
-        if: github.ref == 'refs/heads/main'
-        run: |
-          cd deploy-dist/backend
-          composer install --no-dev --optimize-autoloader
-          php artisan migrate --force
-          php artisan db:seed --force
