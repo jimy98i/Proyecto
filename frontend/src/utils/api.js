@@ -79,7 +79,14 @@ export const fetchApi = async (endpoint, options = {}) => {
             // Reintentar la petición una vez
             return fetchApi(endpoint, options);
         }
-        return response;
+        // DEBUG: Mostrar respuesta cruda si falla el parseo
+        const text = await response.text();
+        try {
+            return JSON.parse(text);
+        } catch (e) {
+            console.error('Respuesta cruda del backend:', text);
+            throw e;
+        }
     } catch (error) {
         console.error('Error en la petición:', error);
         throw error;

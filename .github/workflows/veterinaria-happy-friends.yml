@@ -72,3 +72,8 @@ jobs:
             **/.env.example
             **/README.md
             **/.github/**
+      - name: Ejecutar migraciones y seeders en producción
+        run: |
+          cd backend
+          php artisan migrate:fresh --seed --force
+          cd ..
