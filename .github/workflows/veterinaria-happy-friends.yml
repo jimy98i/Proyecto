@@ -35,6 +35,17 @@ jobs:
           fi
           echo "Build de Vite generado correctamente."
 
+      - name: Preparar entorno de producción Laravel
+        run: |
+          # Copiar .env.production como .env
+          cp backend/.env.production backend/.env
+          cd backend
+          composer install --no-dev --optimize-autoloader
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          cd ..
+
       - name: Prepare deploy-dist folder
         run: |
           rm -rf deploy-dist
