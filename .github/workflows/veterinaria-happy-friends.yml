@@ -55,6 +55,11 @@ jobs:
           # Copiar build del frontend (incluyendo index.html y assets) a la carpeta pública del backend
           rsync -av frontend/dist/ deploy-dist/backend/
 
+      - name: Copiar build del frontend en public sin sobrescribir archivos críticos
+        run: |
+          # Copia el build del frontend en backend/public, pero nunca sobrescribe index.php ni .htaccess
+          rsync -av --exclude='index.php' --exclude='.htaccess' frontend/dist/ backend/public/
+
       - name: Deploy to Production (FTP)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
