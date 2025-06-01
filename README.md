@@ -56,7 +56,8 @@ El entorno de desarrollo está compuesto por los siguientes servicios:
   - `MYSQL_USER=admin`
   - `MYSQL_PASSWORD=admin`
 - **Volúmenes**:
-  - `database:/var/lib/mysql`
+  - `./database:/var/lib/mysql`
+  - Generar carpeta del volumen en la raiz del proyecto con nombre database.
 
 ### 4. **phpMyAdmin**
 - **Imagen**: `phpmyadmin/phpmyadmin`
@@ -90,7 +91,7 @@ El entorno de desarrollo está compuesto por los siguientes servicios:
 - **Motor**: MySQL.
 - **Gestión**:
   - phpMyAdmin para administración visual.
-  - Scripts de inicialización en `backend/database/init.sql`.
+  - Scripts de inicialización en `backend/database/init.sql`. 
 
 ---
 
