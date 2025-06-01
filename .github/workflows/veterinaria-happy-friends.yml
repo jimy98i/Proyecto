@@ -49,25 +49,18 @@ jobs:
       - name: Prepare deploy-dist folder
         run: |
           rm -rf deploy-dist
-          mkdir -p deploy-dist/backend/public
-          # Copiar backend necesario
-          rsync -av --exclude='node_modules' --exclude='tests' --exclude='.env.example' --exclude='README.md' backend/ deploy-dist/backend/
-          # Copiar build del frontend (incluyendo index.html y assets) a la carpeta pública del backend
-          rsync -av frontend/dist/ deploy-dist/backend/public/
+          mkdir -p deploy-dist/frontend
+          # Copiar solo el build del frontend a deploy-dist/frontend
+          rsync -av frontend/dist/ deploy-dist/frontend/
 
-      - name: Copiar build del frontend en public sin sobrescribir archivos críticos
-        run: |
-          # Copia el build del frontend en backend/public, pero nunca sobrescribe index.php ni .htaccess
-          rsync -av --exclude='index.php' --exclude='.htaccess' frontend/dist/ backend/public/
-
-      - name: Deploy to Production (FTP)
+      - name: Deploy frontend build to Production (FTP)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: /web/
-          local-dir: ./deploy-dist/backend/
+          local-dir: ./deploy-dist/frontend/
           exclude: |
             **/.git*
             **/node_modules/**
@@ -77,5 +70,3 @@ jobs:
             **/.env.example
             **/README.md
             **/.github/**
-            **/public/index.php
-            **/public/.htaccess
