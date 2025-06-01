@@ -5,16 +5,13 @@
 
     RewriteEngine On
 
-    # Redirigir www a sin www y forzar HTTPS (si el hosting lo permite)
-    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
-    RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
-    RewriteCond %{HTTPS} off
-    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Permitir acceso a archivos estáticos y de entrada
-    <FilesMatch "\.(html|php|js|css|svg|png|jpg|jpeg|gif|ico|json|txt|woff|woff2|ttf|eot|map)$">
-        Require all granted
-    </FilesMatch>
+    # Handle X-XSRF-Token Header
+    RewriteCond %{HTTP:x-xsrf-token} .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
     # Redirigir rutas de la API a Laravel (ajusta si tu API está en /api)
     RewriteCond %{REQUEST_URI} ^/api/
@@ -34,6 +31,4 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
-
 </IfModule>
-
