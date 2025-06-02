@@ -6,29 +6,19 @@
     RewriteEngine On
 
     # Forzar HTTPS
-    RewriteCond %{HTTPS} !=on
-    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    # RewriteCond %{HTTPS} !=on
+    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-    # Handle Authorization Header
-    RewriteCond %{HTTP:Authorization} .
-    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    # Redirigir rutas de la API y backend a index.php
+    RewriteCond %{REQUEST_URI} ^/(api|sanctum|login|logout|register|password|email|_ignition|storage|broadcasting)
+    RewriteRule ^ index.php [L]
 
-    # Handle X-XSRF-Token Header
-    RewriteCond %{HTTP:x-xsrf-token} .
-    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
+    # Servir archivos existentes directamente
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
 
-    # Redirigir rutas de la API a Laravel (ajusta si tu API está en /api)
-    RewriteCond %{REQUEST_URI} ^/api/
-    RewriteRule ^api/(.*)$ index.php [L]
-
-    # Servir los assets generados por Vite correctamente
-    RewriteCond %{REQUEST_URI} ^/assets/
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^assets/(.*)$ public/assets/$1 [L]
-
-    # Redirigir todo lo que no sea un archivo real a index.html (SPA React)
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
+    # Todo lo demás (SPA React) a index.html
     RewriteRule ^ index.html [L]
 
     # Redirect Trailing Slashes If Not A Folder...
