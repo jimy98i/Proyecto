@@ -178,26 +178,25 @@ export const AuthProvider = ({ children }) => {
             await initializeCsrf();
 
             const loginResponse = await post('/login', { email, password });
-            
-            if (!loginResponse.ok) {
-                const errorData = await loginResponse.json();
-                if (errorData.message === 'Invalid credentials.') {
+
+            if (loginResponse.error || loginResponse.message === 'Invalid credentials.' || loginResponse.message === 'User not found') {
+                if (loginResponse.message === 'Invalid credentials.') {
                     throw new Error('Credenciales incorrectas. Por favor, verifica tu email y contraseña.');
-                } else if (errorData.message === 'User not found') {
+                } else if (loginResponse.message === 'User not found') {
                     throw new Error('El usuario no existe. Por favor, regístrate primero.');
                 } else {
                     throw new Error('Error desconocido. Por favor, inténtalo de nuevo más tarde.');
                 }
             }
 
-            const loginData = await loginResponse.json();
+            const loginData = loginResponse;
 
             const userResponse = await get(`/user/${loginData.user}`);
-            if (!userResponse.ok) {
+            // userResponse ya es el JSON, no un objeto Response
+            if (userResponse.error || userResponse.message === 'Unauthenticated.' || !userResponse.id) {
                 throw new Error('No autenticado');
             }
-
-            const userData = await userResponse.json();
+            const userData = userResponse;
 
             localStorage.setItem('isAuthenticated', 'true');
             localStorage.setItem('userName', userData.nombre);
@@ -268,4 +267,4 @@ export const useAuth = () => {
         throw new Error('useAuth debe ser usado dentro de un AuthProvider');
     }
     return context;
-}; 
+};
