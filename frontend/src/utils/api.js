@@ -15,17 +15,15 @@ export const initializeCsrf = async () => {
     try {
         const response = await fetch(`${API_URL}/sanctum/csrf-cookie`, {
             method: 'GET',
-            // credentials: 'include',
+            credentials: 'include',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             }
         });
-        
         if (!response.ok) {
             throw new Error('Error al obtener el token CSRF');
         }
-        
         return true;
     } catch (error) {
         console.error('Error al inicializar CSRF:', error);
