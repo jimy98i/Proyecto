@@ -12,13 +12,7 @@ const NotificationBell = () => {
     try {
       setIsLoading(true);
       const response = await get('/appointment');
-      
-      if (!response.ok) {
-        throw new Error('Error al obtener las citas');
-      }
-      
-      const data = await response.json();
-      
+      const data = Array.isArray(response) ? response : [];
       const pending = data.filter(appointment => appointment.status === 'programada');
       
       setPendingAppointments(pending);
@@ -107,4 +101,4 @@ const NotificationBell = () => {
   );
 };
 
-export default NotificationBell; 
+export default NotificationBell;

@@ -27,11 +27,10 @@ const ClientManagement = () => {
     const loadClients = async () => {
         try {
             const response = await get('/users/clients/cliente');
-            if (!response.ok) {
+            if (response.error) {
                 throw new Error('Error al cargar clientes');
             }
-            const data = await response.json();
-            setClients(data);
+            setClients(response);
         } catch (error) {
             console.error('Error al cargar clientes:', error);
         }

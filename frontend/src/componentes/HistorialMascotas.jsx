@@ -14,18 +14,23 @@ const HistorialMascotas = () => {
             try {
                 // Obtener mascotas del cliente
                 const responseMascotas = await get(`/pet/client/${userId}`);
-                if (!responseMascotas.ok) throw new Error('Error al cargar las mascotas');
-                const mascotasData = await responseMascotas.json();
-                setMascotas(mascotasData);
+                if (responseMascotas.error) throw new Error('Error al cargar las mascotas');
+                setMascotas(responseMascotas);
 
                 // Obtener historiales para cada mascota
                 const historialesData = {};
-                for (const mascota of mascotasData) {
-                    const responseHistorial = await get(`/history/${mascota.history_id}`);
-                    if (responseHistorial.ok) {
-                        const historial = await responseHistorial.json();
-                        historialesData[mascota.id] = historial;
+                for (const mascota of responseMascotas) {
+                    const responseHistorial = await get(`/history/${mascota.id}`);
+                    if (responseHistorial.error) {
+                        continue;
                     }
+                    // Obtener las líneas del historial
+                    const responseLines = await get(`/historyline/${responseHistorial.id}`);
+                    const history_lines = Array.isArray(responseLines) ? responseLines : [];
+                    historialesData[mascota.id] = {
+                        ...responseHistorial,
+                        history_lines
+                    };
                 }
                 setHistoriales(historialesData);
             } catch (err) {
@@ -52,7 +57,7 @@ const HistorialMascotas = () => {
                         <span className="text-gray-600">{mascota.tipo}</span>
                     </div>
 
-                    {historiales[mascota.id] && (
+                    {historiales[mascota.id] && historiales[mascota.id].history_lines && historiales[mascota.id].history_lines.length > 0 ? (
                         <div className="mt-4">
                             <h4 className="text-lg font-medium mb-3">Historial Clínico</h4>
                             <div className="overflow-x-auto">
@@ -66,7 +71,7 @@ const HistorialMascotas = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {historiales[mascota.id].history_lines?.map(linea => (
+                                        {historiales[mascota.id].history_lines.map(linea => (
                                             <tr key={linea.id} className="border-b">
                                                 <td className="px-4 py-2">
                                                     {new Date(linea.fecha).toLocaleDateString()}
@@ -80,6 +85,8 @@ const HistorialMascotas = () => {
                                 </table>
                             </div>
                         </div>
+                    ) : (
+                        <p className="text-muted text-center">No hay historial disponible</p>
                     )}
                 </div>
             ))}
@@ -93,4 +100,4 @@ const HistorialMascotas = () => {
     );
 };
 
-export default HistorialMascotas; 
+export default HistorialMascotas;

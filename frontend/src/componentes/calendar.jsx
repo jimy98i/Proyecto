@@ -157,20 +157,21 @@ export default class Calendar extends React.Component {
     try {
       if (this.state.modalAction === 'create') {
         const response = await post('/appointment', formData);
-        if (!response.ok) {
-          throw new Error('Error al añadir el evento');
+        if (response.error) {
+          throw new Error(response.error || 'Error al añadir el evento');
         }
         await this.loadEvents();
       } else if (this.state.modalAction === 'edit') {
         const response = await put(`/appointment/${formData.id}`, formData);
-        if (!response.ok) {
-          throw new Error('Error al actualizar el evento');
+        if (response.error) {
+          throw new Error(response.error || 'Error al actualizar el evento');
         }
         await this.loadEvents();
       }
       this.closeModal();
     } catch (error) {
       console.error('Error en la operación:', error);
+      // this.setState({ error: error.message });
     }
   };
 

@@ -3,17 +3,9 @@ import { get } from '../utils/api';
 export const fetchAppointments = async () => {
     try {
         const response = await get('/appointment');
-        
-        // Obtener el JSON de la respuesta
-        const appointments = await response.json();
+        const appointments = Array.isArray(response) ? response : [];
         console.log('Citas obtenidas:', appointments);
-        // Asegurarnos de que appointments es un array
-        if (!Array.isArray(appointments)) {
-            console.error('La respuesta no es un array:', appointments);
-            return [];
-        }
-
-        const mappedAppointments = appointments.map(appointment => {
+        return appointments.map(appointment => {
             const event = {
                 id: appointment.id,
                 title: appointment.title || 'Pendiente',
@@ -29,9 +21,8 @@ export const fetchAppointments = async () => {
             console.log('Evento mapeado:', event);
             return event;
         });
-
-        return mappedAppointments;
     } catch (error) {
+        console.error('Error obteniendo citas:', error);
         return [];
     }
 };

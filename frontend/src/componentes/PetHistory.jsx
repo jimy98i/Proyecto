@@ -19,33 +19,24 @@ const PetHistory = () => {
                 try {
                     // Obtener mascotas del cliente
                     const responseMascotas = await get(`/pet/client/${localStorage.getItem('userName')}`);
-                    if (!responseMascotas.ok) throw new Error('Error al cargar las mascotas');
-                    const mascotasData = await responseMascotas.json();
-                    setMascotas(mascotasData);
+                    if (responseMascotas.error) throw new Error('Error al cargar las mascotas');
+                    setMascotas(responseMascotas);
 
                     // Obtener historiales para cada mascota
                     const historialesData = {};
-                    for (const mascota of mascotasData) {
+                    for (const mascota of responseMascotas) {
                         // Primero obtenemos el historial de la mascota
                         const responseHistorial = await get(`/history/${mascota.id}`);
-                        if (responseHistorial.ok) {
-                            const historial = await responseHistorial.json();
-                            // Luego obtenemos las líneas de historial
-                            const responseHistoryLines = await get(`/historyline/${historial.id}`);
-                            if (responseHistoryLines.ok) {
-                                const historyLines = await responseHistoryLines.json();
-                                // Obtenemos los tratamientos del historial
-                                const responseTreatments = await get(`/treatment/history/${historial.id}`);
-                                if (responseTreatments.ok) {
-                                    const treatments = await responseTreatments.json();
-                                    historialesData[mascota.id] = {
-                                        ...historial,
-                                        history_lines: historyLines,
-                                        treatments: treatments
-                                    };
-                                }
-                            }
+                        if (responseHistorial.error) {
+                            continue;
                         }
+                        // Obtener las líneas del historial
+                        const responseLines = await get(`/historyline/${responseHistorial.id}`);
+                        const history_lines = Array.isArray(responseLines) ? responseLines : [];
+                        historialesData[mascota.id] = {
+                            ...responseHistorial,
+                            history_lines
+                        };
                     }
                     setHistoriales(historialesData);
                 } catch (err) {
@@ -155,4 +146,4 @@ const getEstadoBadgeClass = (estado) => {
     }
 };
 
-export default PetHistory; 
+export default PetHistory;

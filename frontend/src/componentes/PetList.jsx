@@ -22,11 +22,11 @@ const PetList = () => {
   const fetchPets = async () => {
     try {
       const response = await get(`/pet/client/${localStorage.getItem('userName')}`);
-      if (!response.ok) {
-        throw new Error('Error al obtener las mascotas');
+      // get() ya devuelve el JSON, no un objeto Response
+      if (response.error) {
+        throw new Error(response.error || 'Error al obtener las mascotas');
       }
-      const data = await response.json();
-      setPets(data);
+      setPets(response);
     } catch (error) {
       console.error('Error:', error);
     }
@@ -228,4 +228,4 @@ const PetList = () => {
   );
 };
 
-export default PetList; 
+export default PetList;
