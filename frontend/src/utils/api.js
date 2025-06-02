@@ -19,6 +19,7 @@ export const initializeCsrf = async () => {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                'authorization': `Basic ${btoa(`${import.meta.env.VITE_API_BASIC_USER}:${import.meta.env.VITE_API_BASIC_PASS}`)}`,  
             }
         });
         if (!response.ok) {
@@ -53,7 +54,8 @@ export const fetchApi = async (endpoint, options = {}) => {
     // Si el hosting requiere autenticación básica, añade el header Authorization
     const basicUser = import.meta.env.VITE_API_BASIC_USER;
     const basicPass = import.meta.env.VITE_API_BASIC_PASS;
-    if (basicUser && basicPass) {
+    // Solo añadir Authorization Basic si NO es la ruta de CSRF
+    if (basicUser && basicPass && endpoint !== '/sanctum/csrf-cookie') {
         defaultHeaders['Authorization'] = 'Basic ' + btoa(`${basicUser}:${basicPass}`);
     }
 
