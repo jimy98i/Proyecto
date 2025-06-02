@@ -15,7 +15,7 @@ export const initializeCsrf = async () => {
     try {
         const response = await fetch(`${API_URL}/sanctum/csrf-cookie`, {
             method: 'GET',
-            credentials: 'include',
+            // credentials: 'include',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
