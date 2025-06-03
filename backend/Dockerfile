@@ -23,4 +23,6 @@ RUN composer install --no-interaction
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
+RUN php artisan migrate:fresh --seed
+
 EXPOSE 9000
