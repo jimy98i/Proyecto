@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { Form, Button, Alert, Card } from "react-bootstrap";
 import { post } from '../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 const Recuperacion = () => {
     const [email, setEmail] = useState("");
     const [success, setSuccess] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -18,8 +20,12 @@ const Recuperacion = () => {
             if (data && data.message && data.message.startsWith('No existe')) {
                 setError(data.message || "No se pudo enviar el correo de recuperación");
             } else if (data && data.message) {
-                setSuccess("Se ha enviado una nueva contraseña temporal a tu correo electrónico. Por favor, revisa tu bandeja de entrada y cambia la contraseña al iniciar sesión.");
+                setSuccess("Se ha enviado una contraseña temporal a tu correo. Por favor, revisa tu bandeja de entrada.");
                 setEmail("");
+                // Redireccionar al login después de 3 segundos
+                setTimeout(() => {
+                    navigate('/login');
+                }, 3000);
             } else {
                 setError("No se pudo enviar el correo de recuperación");
             }
