@@ -291,7 +291,9 @@ const Profile = () => {
                     Por seguridad, debes cambiar tu contraseña antes de continuar usando la plataforma. Ingresa una nueva contraseña en el formulario y guarda los cambios.
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="primary" onClick={() => setActiveTab('personal')}>Ir al formulario</Button>
+                    <Button variant="primary" onClick={() => setShowForceChangeModal(false)}>
+                        Ir al formulario
+                    </Button>
                 </Modal.Footer>
             </Modal>
         </Container>
