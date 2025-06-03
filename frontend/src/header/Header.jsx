@@ -50,7 +50,7 @@ const Header = () => {
             </Nav>
 
             {isAuthenticated ? (
-              <Dropdown align="end" drop="down-centered">
+              <Dropdown align="end" drop={window.innerWidth < 992 ? "down" : "down-centered"}>
                 <Dropdown.Toggle
                   variant="outline-light"
                   id="dropdown-user"
