@@ -167,7 +167,6 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
         }
       });
       const historyData = await historyResponse.json();
-      console.log('Respuesta del historial:', historyData);
       
       let historialId;
       
@@ -188,7 +187,6 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
           })
         });
         const newHistoryData = await newHistoryResponse.json();
-        console.log('Respuesta de crear historial:', newHistoryData);
         
         if (!newHistoryData.id) {
           throw new Error('Error al crear el historial: No se recibió un ID válido');
@@ -218,7 +216,6 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
       });
 
       const newLineData = await newLineResponse.json();
-      console.log('Respuesta de crear línea de historial:', newLineData);
 
       if (!newLineData.id) {
         throw new Error('Error al crear la línea de historial: No se recibió un ID válido');

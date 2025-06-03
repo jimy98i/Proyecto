@@ -15,7 +15,6 @@ import { Button } from './componentes/Button';
 const App = () => {
   const [apiResponse, setApiResponse] = useState(null);  // State para almacenar la respuesta del backend
   const apiUrl = import.meta.env.VITE_API_URL + '/ping';
-  console.log(apiResponse);
   // useEffect para hacer la llamada a la API cuando el componente se monte
   useEffect(() => {
     fetch(apiUrl, {
@@ -28,7 +27,6 @@ const App = () => {
     })
     .then(response => response.json())
     .then(data => {
-      console.log(data);
       setApiResponse(data);  // Almacenamos la respuesta en el estado
     })
     .catch(error => console.log('Error:', error));

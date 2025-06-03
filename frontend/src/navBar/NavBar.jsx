@@ -21,7 +21,6 @@ const NavBar = () => {
   useEffect(() => {
     const checkAuthStatus = () => {
       const authStatus = localStorage.getItem('isAuthenticated') === 'true';
-      console.log('Auth status:', authStatus);
       setIsAuthenticated(authStatus);
     };
 
@@ -43,7 +42,6 @@ const NavBar = () => {
         localStorage.removeItem('access_token');
         localStorage.removeItem('user');
         localStorage.removeItem('userRole');
-        console.log('Usuario deslogueado');
         navigate('/');
       } catch (error) {
         console.error('Error de red:', error);

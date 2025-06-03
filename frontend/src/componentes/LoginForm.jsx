@@ -21,7 +21,6 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Formulario enviado');
     setError('');
     setEmailError(false);
     setPasswordError(false);
@@ -40,7 +39,6 @@ const LoginForm = () => {
     }
 
     try {
-      console.log('Intentando login con:', { email });
       await login({ email, password });
     } catch (err) {
       console.error('Error en login:', err);

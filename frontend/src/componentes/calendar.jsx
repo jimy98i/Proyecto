@@ -77,7 +77,6 @@ export default class Calendar extends React.Component {
             notas: event.notas || event.descripcion || '',
           }
         }));
-        console.log('Eventos formateados:', formattedEvents);
         this.setState({ currentEvents: formattedEvents });
       }
     } catch (error) {
@@ -92,7 +91,6 @@ export default class Calendar extends React.Component {
   }
 
   openModal = (action, eventData = {}) => {
-    // console.log('Abriendo modal con datos:', eventData);
     this.setState({
       isModalOpen: true,
       modalData: eventData,
@@ -293,7 +291,6 @@ export default class Calendar extends React.Component {
           <ul>
             {this.state.currentEvents.map(event => {
               const status = event.status || event.extendedProps?.status || 'programada';
-              // console.log('Renderizando evento:', { id: event.id, title: event.title, status });
               return (
                 <li key={event.id} className="mb-2">
                   <div className="d-flex justify-content-between align-items-center">

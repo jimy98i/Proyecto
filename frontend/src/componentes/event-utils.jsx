@@ -4,7 +4,6 @@ export const fetchAppointments = async () => {
     try {
         const response = await get('/appointment');
         const appointments = Array.isArray(response) ? response : [];
-        console.log('Citas obtenidas:', appointments);
         return appointments.map(appointment => {
             const event = {
                 id: appointment.id,
@@ -18,7 +17,6 @@ export const fetchAppointments = async () => {
                 historial: appointment.historial,
                 user_id: appointment.user_id || null,
             };
-            console.log('Evento mapeado:', event);
             return event;
         });
     } catch (error) {
