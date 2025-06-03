@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Form, Button, Alert, Card } from "react-bootstrap";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { post } from '../utils/api';
 
 const Recuperacion = () => {
     const [email, setEmail] = useState("");
@@ -15,20 +14,14 @@ const Recuperacion = () => {
         setError("");
         setLoading(true);
         try {
-            const response = await fetch(`${API_URL}/user/recover`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                body: JSON.stringify({ email })
-            });
-            const data = await response.json();
-            if (!response.ok) {
+            const data = await post('/user/recover', { email });
+            if (data && data.message && data.message.startsWith('No existe')) {
                 setError(data.message || "No se pudo enviar el correo de recuperación");
-            } else {
+            } else if (data && data.message) {
                 setSuccess("Se ha enviado una nueva contraseña temporal a tu correo electrónico. Por favor, revisa tu bandeja de entrada y cambia la contraseña al iniciar sesión.");
                 setEmail("");
+            } else {
+                setError("No se pudo enviar el correo de recuperación");
             }
         } catch (err) {
             setError("Error al enviar la solicitud de recuperación");

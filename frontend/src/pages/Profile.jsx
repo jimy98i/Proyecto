@@ -9,6 +9,7 @@ import UploadPhotoButton from '../componentes/UploadPhotoButton';
 import { useNavigate } from 'react-router-dom';
 import '../css/Profile.css';
 import Modal from 'react-bootstrap/Modal';
+import { put } from '../utils/api';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -94,18 +95,9 @@ const Profile = () => {
                 payload.password = formData.newPassword;
                 payload.password_confirmation = formData.confirmPassword;
             }
-            const response = await fetch(`${API_URL}/user/${userId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                credentials: 'include',
-                body: JSON.stringify(payload)
-            });
-            const data = await response.json();
-            if (!response.ok) {
+            // Usar utils/api.js para el fetch con CSRF
+            const data = await put(`/user/${userId}`, payload);
+            if (data && data.message) {
                 setError(data.message || 'Error al actualizar el perfil');
             } else {
                 setSuccess('Perfil actualizado correctamente');
