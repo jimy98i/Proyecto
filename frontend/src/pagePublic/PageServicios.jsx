@@ -63,7 +63,7 @@ const DiagonalSeparator = ({ color = '#b2dfdb' }) => (
 );
 
 const PageServicios = () => (
-  <Container fluid className="p-3" style={{ background: '#fff', minHeight: '100vh', maxWidth: '1400px', margin: '0 auto' }}>
+  <Container fluid className="p-3" style={{ background: 'rgba(255, 255, 255, 0.76)', minHeight: '100vh', maxWidth: '1400px', margin: '0 auto' }}>
     <Row className="justify-content-center mb-5">
       <Col xs={12} md={10}>
         <h2 className="text-center mb-4" style={{ color: '#00796b', fontWeight: 'bold' }}>Nuestros Servicios</h2>

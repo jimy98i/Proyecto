@@ -57,7 +57,7 @@ const FadeInCard = ({ children, delay = 0 }) => (
 );
 
 const PageNosotros = () => (
-  <Container fluid className="p-3" style={{ background: '#fff', minHeight: '100vh', maxWidth: '1400px', margin: '0 auto' }}>
+  <Container fluid className="p-3" style={{ background: 'rgba(255, 255, 255, 0.76)', minHeight: '100vh', maxWidth: '1400px', margin: '0 auto' }}>
     <Row className="justify-content-center mb-4">
       <Col xs={12} md={10}>
         <Card className="shadow border-0 p-4 mb-4" style={{ background: '#e3f2fd', borderRadius: 18, border: '1.5px solid #b2dfdb' }}>

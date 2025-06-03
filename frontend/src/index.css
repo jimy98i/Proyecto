@@ -31,7 +31,7 @@ html, body {
 }
 
 body {
-  background-image: url('./src/assetsfondo.jpg');
+  background-image: url('./src/assets/fondo/fondo.jpg');
   background-size: 100vw 100vh;
   background-position: center;
   background-repeat: no-repeat;
