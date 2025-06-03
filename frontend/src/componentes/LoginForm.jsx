@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { useAuth } from '../auth/AuthContext';
 import { initializeCsrf } from '../utils/api';
+import { Link } from 'react-router-dom';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -87,8 +88,12 @@ const LoginForm = () => {
           {error}
         </div>
       )}
+      <div className="mt-3 text-center">
+        <span>¿Olvidaste tu contraseña? </span>
+        <Link to="/recuperacion">Recupérala aquí</Link>
+      </div>
     </Form>
   );
 };
 
-export default LoginForm; 
+export default LoginForm;

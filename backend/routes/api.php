@@ -61,6 +61,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 // Rutas para el modelo History
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/history/{history}', [HistoryController::class, 'show']); // Obtener un historial específico
     Route::get('/history', [HistoryController::class, 'index']); // Obtener todos los historiales
     Route::post('/history', [HistoryController::class, 'store']); // Crear un nuevo historial
     Route::get('/history/{petId}', [HistoryController::class, 'getByPet']); // Obtener un historial específico
@@ -73,7 +74,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/historyline', [HistoryLineController::class, 'index']); // Obtener todas las líneas de historial
     Route::post('/historyline', [HistoryLineController::class, 'store']); // Crear una nueva línea de historial
-    Route::get('/historyline/{historyLine}', [HistoryLineController::class, 'getByHistory']); // Obtener una línea de historial específica
+    Route::get('/historyline/{historyLine}', [HistoryLineController::class, 'show']); // Obtener una línea de historial específica
     Route::put('/historyline/{historyLine}', [HistoryLineController::class, 'update']); // Actualizar una línea de historial
     Route::delete('/historyline/{historyLine}', [HistoryLineController::class, 'destroy']); // Eliminar una línea de historial
 });
@@ -108,6 +109,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 // Rutas para el modelo Appointment
+Route::get('/appointment', [AppointmentController::class, 'index']); // Obtener todas las citas
+
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/appointment', [AppointmentController::class, 'index']); // Obtener todas las citas
     Route::post('/appointment', [AppointmentController::class, 'store']); // Crear una nueva cita
@@ -171,3 +174,6 @@ Route::middleware(['api'])->group(function () {
 });
 
 // Rutas para la gestión de historiales en citas
+
+// Recuperación de contraseña (sin auth)
+Route::post('/user/recover', [UserController::class, 'recoverPassword']);

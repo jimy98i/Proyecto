@@ -1,0 +1,53 @@
+/* Responsive table for PetList */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.pet-table {
+  min-width: 600px;
+}
+
+@media (max-width: 768px) {
+  .pet-table, .pet-table thead, .pet-table tbody, .pet-table th, .pet-table td, .pet-table tr {
+    display: block;
+    width: 100%;
+  }
+  .pet-table thead {
+    display: none;
+  }
+  .pet-table tr {
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #eee;
+  }
+  .pet-table td {
+    position: relative;
+    padding-left: 50%;
+    text-align: left;
+    border: none;
+    border-bottom: 1px solid #eee;
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  .pet-table td:before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 48%;
+    padding-left: 10px;
+    white-space: nowrap;
+    font-weight: bold;
+    content: attr(data-label);
+    color: #555;
+  }
+}
+
+@media (max-width: 480px) {
+  .pet-table td {
+    padding-left: 45%;
+    font-size: 0.95rem;
+  }
+  .pet-table td:before {
+    font-size: 0.9rem;
+  }
+}

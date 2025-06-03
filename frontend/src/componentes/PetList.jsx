@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import { get, post, put, del } from '../utils/api';
+import './PetList.css';
 
 const PetList = () => {
   const [pets, setPets] = useState([]);
@@ -114,46 +115,48 @@ const PetList = () => {
         Añadir Mascota
       </Button>
 
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Especie</th>
-            <th>Raza</th>
-            <th>Edad</th>
-            <th>Peso</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pets.map(pet => (
-            <tr key={pet.id}>
-              <td>{pet.nombre}</td>
-              <td>{pet.tipo}</td>
-              <td>{pet.raza}</td>
-              <td>{pet.edad}</td>
-              <td>{pet.peso}</td>
-              <td>
-                <Button 
-                  variant="warning" 
-                  size="sm" 
-                  className="me-2"
-                  onClick={() => handleEdit(pet)}
-                >
-                  Editar
-                </Button>
-                <Button 
-                  variant="danger" 
-                  size="sm"
-                  onClick={() => handleDelete(pet.id)}
-                >
-                  Eliminar
-                </Button>
-              </td>
+      <div className="table-responsive">
+        <Table striped bordered hover className="pet-table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Especie</th>
+              <th>Raza</th>
+              <th>Edad</th>
+              <th>Peso</th>
+              <th>Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {pets.map(pet => (
+              <tr key={pet.id}>
+                <td data-label="Nombre">{pet.nombre}</td>
+                <td data-label="Especie">{pet.tipo}</td>
+                <td data-label="Raza">{pet.raza}</td>
+                <td data-label="Edad">{pet.edad}</td>
+                <td data-label="Peso">{pet.peso}</td>
+                <td data-label="Acciones">
+                  <Button 
+                    variant="warning" 
+                    size="sm" 
+                    className="me-2"
+                    onClick={() => handleEdit(pet)}
+                  >
+                    Editar
+                  </Button>
+                  <Button 
+                    variant="danger" 
+                    size="sm"
+                    onClick={() => handleDelete(pet.id)}
+                  >
+                    Eliminar
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
 
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
