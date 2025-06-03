@@ -95,7 +95,7 @@ const Profile = () => {
                 payload.password = formData.newPassword;
                 payload.password_confirmation = formData.confirmPassword;
             }
-            // Usar utils/api.js para el fetch con CSRF
+
             const data = await put(`/user/${userId}`, payload);
             if (data && data.message) {
                 setError(data.message || 'Error al actualizar el perfil');
