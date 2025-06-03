@@ -8,6 +8,10 @@
   min-width: 600px;
 }
 
+.pet-table th, .pet-table td {
+  white-space: nowrap;
+}
+
 @media (max-width: 768px) {
   .pet-table, .pet-table thead, .pet-table tbody, .pet-table th, .pet-table td, .pet-table tr {
     display: block;
@@ -40,6 +44,10 @@
     content: attr(data-label);
     color: #555;
   }
+  .pet-table th, .pet-table td {
+    font-size: 0.95em;
+    padding: 0.4em 0.5em;
+  }
 }
 
 @media (max-width: 480px) {
@@ -49,5 +57,29 @@
   }
   .pet-table td:before {
     font-size: 0.9rem;
+  }
+  .pet-table th, .pet-table td {
+    font-size: 0.9em;
+    padding: 0.3em 0.3em;
+  }
+  .pet-table {
+    min-width: 500px;
+  }
+}
+
+.pet-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pet-card {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border-radius: 12px;
+}
+
+@media (min-width: 769px) {
+  .pet-cards-list {
+    display: none;
   }
 }

@@ -13,6 +13,7 @@ import MyPerfil from './pages/Profile';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import HistorialMascotas from './componentes/HistorialMascotas';
+import Recuperacion from './pages/Recuperacion';
 
 const PrivateRoute = ({ children, allowedRoles = [] }) => {
   const { userRole, isAuthenticated } = useAuth();
@@ -53,6 +54,7 @@ const App = () => {
           <Route path="nosotros" element={<PageNosotros />} />
           <Route path="servicios" element={<PageServicios />} />
           <Route path="login" element={<Login />} />
+          <Route path="recuperacion" element={<Recuperacion />} />
         </Route>
 
         {/* Rutas protegidas para clientes */}
