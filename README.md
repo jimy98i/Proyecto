@@ -132,6 +132,8 @@ El archivo `backend/database/dump/dump-veterinaria-202505301837.sql` contiene sc
 - **Credenciales**:
   - Administrado-> usu: admin@example pass: password
   - Cliente-> usu: client@example pass: password
+-**MySQL**:
+  -Para acceder en produccion desde un gestor de bases de datos: host-> 98.83.226.32/ PORT-> 3306, usuario-> admin, pass-> admin
 --- 
 
 ## Créditos y Licencia
