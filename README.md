@@ -91,7 +91,7 @@ El entorno de desarrollo está compuesto por los siguientes servicios:
 - **Motor**: MySQL.
 - **Gestión**:
   - phpMyAdmin para administración visual.
-  - Scripts de inicialización en `backend/database/init.sql`. 
+  - Scripts de inicialización en `backend/database/dump/dump-veterinaria-202505301837.sql`. 
 
 ---
 
@@ -117,7 +117,7 @@ El entorno de desarrollo está compuesto por los siguientes servicios:
 
 ## Scripts de Inicialización
 
-El archivo `backend/database/init.sql` contiene scripts para inicializar la base de datos con datos de ejemplo.
+El archivo `backend/database/dump/dump-veterinaria-202505301837.sql` contiene scripts para inicializar la base de datos con datos de ejemplo.
 
 ---
 
@@ -129,7 +129,11 @@ El archivo `backend/database/init.sql` contiene scripts para inicializar la base
 - **Depuración**:
   - Logs del backend disponibles en `storage/logs/`.
   - Logs de Docker accesibles con `docker logs <NOMBRE_DEL_CONTENEDOR>`.
-
+- **Credenciales**:
+  - Administrado-> usu: admin@example pass: password
+  - Cliente-> usu: client@example pass: password
+-**MySQL**:
+  -Para acceder en produccion desde un gestor de bases de datos: host-> 98.83.226.32/ PORT-> 3306, usuario-> admin, pass-> admin
 --- 
 
 ## Créditos y Licencia
