@@ -53,7 +53,11 @@ class UserController extends Controller
 
     public function update(UpdateUserRequest $request, User $user): JsonResponse
     {
-        $this->userService->update($user, $request->validated());
+        $data = $request->validated();
+        if (isset($data['password'])) {
+            $data['force_password_change'] = false;
+        }
+        $this->userService->update($user, $data);
         return response()->json($user);
     }
 
