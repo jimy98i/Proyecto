@@ -45,8 +45,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: veterinaria
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
     volumes:
       - ./database:/var/lib/mysql
     networks:
