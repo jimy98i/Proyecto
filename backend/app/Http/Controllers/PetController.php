@@ -52,10 +52,10 @@ class PetController extends Controller
         return response()->json(null, 204);
     }
 
-    public function getPetsByClient($nombreUsuario): JsonResponse
+    public function getPetsByClient($idUsuario): JsonResponse
     {  
         // dd($nombreUsuario);
-        $userId = (int) User::where('nombre', $nombreUsuario)->value('id');
+        $userId = (int) User::where('id', $idUsuario);
         
         if (!$userId) {
             return response()->json(['error' => 'Usuario no encontrado'], 404);
