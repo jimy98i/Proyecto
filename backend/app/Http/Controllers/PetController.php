@@ -54,14 +54,11 @@ class PetController extends Controller
 
     public function getPetsByClient($idUsuario): JsonResponse
     {  
-        // dd($nombreUsuario);
-        $userId = (int) User::where('id', $idUsuario);
-        
-        if (!$userId) {
+        $user = User::find($client);
+        if (!$user) {
             return response()->json(['error' => 'Usuario no encontrado'], 404);
         }
-
-        $pets = $this->petService->getPetsByClient($userId);
+        $pets = $this->petService->getPetsByClient($client);
         return response()->json($pets);
     }
 
