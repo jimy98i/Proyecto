@@ -14,7 +14,7 @@ import { put } from '../utils/api';
 const API_URL = import.meta.env.VITE_API_URL;
 
 const Profile = () => {
-    const { userName, userRole, userEmail, userId, token, profileImage: contextProfileImage, forcePasswordChange, setForcePasswordChange } = useAuth();
+    const { userName, userRole, userEmail, userId, token, profileImage: contextProfileImage, forcePasswordChange, setForcePasswordChange, setUserName } = useAuth();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('personal');
     const [formData, setFormData] = useState({
@@ -107,6 +107,17 @@ const Profile = () => {
                     newPassword: '',
                     confirmPassword: ''
                 }));
+                // Actualizar el nombre de usuario en el contexto y en el estado local si cambió
+                if (formData.name !== userName) {
+                    if (typeof setUserName === 'function') {
+                        setUserName(formData.name);
+                    }
+                    localStorage.setItem('userName', formData.name);
+                    setFormData(prev => ({
+                        ...prev,
+                        name: formData.name
+                    }));
+                }
                 // Si el cambio de contraseña fue forzado, desactivar el flag
                 if (forcePasswordChange) {
                     setForcePasswordChange(false);
