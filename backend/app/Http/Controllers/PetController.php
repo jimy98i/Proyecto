@@ -52,15 +52,12 @@ class PetController extends Controller
         return response()->json(null, 204);
     }
 
-    public function getPetsByClient($idUsuario): JsonResponse
-    {  
-        // dd($nombreUsuario);
-        $userId = (int) User::where('id', $idUsuario);
-        
-        if (!$userId) {
+    public function getPetsByClient($userId): JsonResponse
+    {
+        $user = User::find($userId);
+        if (!$user) {
             return response()->json(['error' => 'Usuario no encontrado'], 404);
         }
-
         $pets = $this->petService->getPetsByClient($userId);
         return response()->json($pets);
     }
@@ -76,4 +73,4 @@ class PetController extends Controller
         $pets = $this->petService->getPetsWithAppointments();
         return response()->json($pets);
     }
-} 
+}
