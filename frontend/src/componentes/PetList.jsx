@@ -22,7 +22,7 @@ const PetList = () => {
 
   const fetchPets = async () => {
     try {
-      const response = await get(`/pet/client/${localStorage.getItem('userName')}`);
+      const response = await get(`/pet/client/${localStorage.getItem('userId')}`);
       // get() ya devuelve el JSON, no un objeto Response
       if (response.error) {
         throw new Error(response.error || 'Error al obtener las mascotas');

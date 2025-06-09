@@ -19,7 +19,7 @@ const PetHistory = () => {
                 setLoading(true);
                 try {
                     // Obtener mascotas del cliente
-                    const responseMascotas = await get(`/pet/client/${localStorage.getItem('userName')}`);
+                    const responseMascotas = await get(`/pet/client/${localStorage.getItem('userId')}`);
                     if (responseMascotas.error) throw new Error('Error al cargar las mascotas');
                     setMascotas(responseMascotas);
 
