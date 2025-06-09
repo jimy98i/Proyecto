@@ -134,6 +134,11 @@ export default class Calendar extends React.Component {
   };
 
   handleEventClick = (info) => {
+    const userRole = localStorage.getItem('userRole');
+    if (userRole === 'cliente') {
+      // Si es cliente, no permitir abrir el modal de edición
+      return;
+    }
     const eventData = {
       id: info.event.id,
       title: info.event.title,
@@ -142,9 +147,7 @@ export default class Calendar extends React.Component {
       tipo_cita: info.event.extendedProps.tipo_cita || info.event.title || '',
       estado: info.event.extendedProps.status || info.event.extendedProps.estado || 'programada',
       notas: info.event.extendedProps.notas || info.event.extendedProps.descripcion || '',
-      // Añadimos la mascota asociada si existe en los extendedProps
       mascota_id: info.event.extendedProps?.historial?.mascota?.id || '',
-      // Si tienes la línea de historial, también pásala
       linea_historial_id: info.event.extendedProps?.historial?.id || '',
       user_id: info.event.extendedProps.user_id || '',
     };

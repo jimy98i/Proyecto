@@ -27,18 +27,22 @@ const ExportButtons = () => {
     const getCurrentMonthData = async () => {
         try {
             const response = await get('/appointment');
-            
-            if (!(response instanceof Response)) {
-                throw new Error('La respuesta no es un objeto Response válido');
-            }
+            // El backend devuelve directamente el array de citas
+            const appointments = Array.isArray(response) ? response : [];
 
-            const appointments = await response.json();
+            // Filtrar por mes y año actual
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
 
-            if (!Array.isArray(appointments)) {
-                return [];
-            }
+            const filteredAppointments = appointments.filter(app => {
+                // app.start puede ser string tipo '2025-06-03T10:00:00' o '2025-06-03'
+                const date = app.start ? new Date(app.start) : (app.fecha_cita ? new Date(app.fecha_cita) : null);
+                if (!date || isNaN(date)) return false;
+                return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+            });
 
-            return appointments.map(appointment => ({
+            return filteredAppointments.map(appointment => ({
                 ID: appointment.id,
                 Tipo: appointment.title || 'Pendiente',
                 Fecha: appointment.start,
@@ -225,4 +229,4 @@ const ExportButtons = () => {
     );
 };
 
-export default ExportButtons; 
+export default ExportButtons;

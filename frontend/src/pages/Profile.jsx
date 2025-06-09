@@ -8,11 +8,13 @@ import PetHistory from '../componentes/PetHistory';
 import UploadPhotoButton from '../componentes/UploadPhotoButton';
 import { useNavigate } from 'react-router-dom';
 import '../css/Profile.css';
+import Modal from 'react-bootstrap/Modal';
+import { put } from '../utils/api';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const Profile = () => {
-    const { userName, userRole, userEmail, userId, token, profileImage: contextProfileImage } = useAuth();
+    const { userName, userRole, userEmail, userId, token, profileImage: contextProfileImage, forcePasswordChange, setForcePasswordChange } = useAuth();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('personal');
     const [formData, setFormData] = useState({
@@ -26,6 +28,9 @@ const Profile = () => {
     const [previewUrl, setPreviewUrl] = useState(null);
     const [profileImage, setProfileImage] = useState(null);
     const [imageError, setImageError] = useState(false);
+    const [success, setSuccess] = useState('');
+    const [error, setError] = useState('');
+    const [showForceChangeModal, setShowForceChangeModal] = useState(false);
 
     useEffect(() => {
         if (!token) {
@@ -58,6 +63,13 @@ const Profile = () => {
         }
     }, [profileImage, imageError]);
 
+    useEffect(() => {
+        if (forcePasswordChange) {
+            setShowForceChangeModal(true);
+            setActiveTab('personal');
+        }
+    }, [forcePasswordChange]);
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -68,9 +80,42 @@ const Profile = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setSuccess('');
+        setError('');
         if (!formData.name || !formData.email) {
-            alert('Por favor, complete todos los campos obligatorios');
+            setError('Por favor, complete todos los campos obligatorios');
             return;
+        }
+        try {
+            const payload = {
+                nombre: formData.name,
+                email: formData.email
+            };
+            if (formData.newPassword) {
+                payload.password = formData.newPassword;
+                payload.password_confirmation = formData.confirmPassword;
+            }
+
+            const data = await put(`/user/${userId}`, payload);
+            if (data && data.message) {
+                setError(data.message || 'Error al actualizar el perfil');
+            } else {
+                setSuccess('Perfil actualizado correctamente');
+                setFormData(prev => ({
+                    ...prev,
+                    currentPassword: '',
+                    newPassword: '',
+                    confirmPassword: ''
+                }));
+                // Si el cambio de contraseña fue forzado, desactivar el flag
+                if (forcePasswordChange) {
+                    setForcePasswordChange(false);
+                    localStorage.setItem('force_password_change', 'false');
+                    setShowForceChangeModal(false);
+                }
+            }
+        } catch (err) {
+            setError('Error al actualizar el perfil');
         }
     };
 
@@ -191,6 +236,8 @@ const Profile = () => {
                                     <Button variant="primary" type="submit">
                                         Guardar Cambios
                                     </Button>
+                                    {success && <div className="alert alert-success mt-3">{success}</div>}
+                                    {error && <div className="alert alert-danger mt-3">{error}</div>}
                                 </Form>
                             )}
 
@@ -235,8 +282,22 @@ const Profile = () => {
                     </Card>
                 </Col>
             </Row>
+
+            <Modal show={showForceChangeModal} backdrop="static" keyboard={false} centered>
+                <Modal.Header>
+                    <Modal.Title>Cambio de contraseña requerido</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Por seguridad, debes cambiar tu contraseña antes de continuar usando la plataforma. Ingresa una nueva contraseña en el formulario y guarda los cambios.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={() => setShowForceChangeModal(false)}>
+                        Ir al formulario
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 };
 
-export default Profile; 
+export default Profile;

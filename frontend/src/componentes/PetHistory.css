@@ -1,0 +1,34 @@
+.pet-history-table th, .pet-history-table td {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .pet-history-table th, .pet-history-table td {
+    font-size: 0.95em;
+    padding: 0.4em 0.5em;
+  }
+  .pet-history-table {
+    min-width: 600px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pet-history-table th, .pet-history-table td {
+    font-size: 0.9em;
+    padding: 0.3em 0.3em;
+  }
+  .pet-history-table {
+    min-width: 500px;
+  }
+}
+
+.pet-card {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border-radius: 12px;
+}
+
+@media (min-width: 769px) {
+  .pet-card {
+    display: none;
+  }
+}

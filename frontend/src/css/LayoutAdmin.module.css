@@ -31,6 +31,7 @@
 
 /* Botón de las tres barras */
 .btn-outline-light {
+    padding-left: 10px;
     border-color: #ecf0f1;
     color: #ecf0f1;
 }
@@ -196,6 +197,27 @@ p {
 
     .col-12 {
         margin-left: 200px; /* Ajustar el contenido principal */
+    }
+}
+
+/* Ajuste especial para tablets: usar ancho completo y ocultar sidebar fijo */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .layout-admin {
+        display: grid !important;
+        grid-template-areas:
+            "header"
+            "content"
+            "footer" !important;
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto 1fr auto !important;
+        height: 100vh !important;
+    }
+    .sidebar {
+        display: none !important;
+    }
+    .content {
+        width: 100% !important;
+        padding: 1rem !important;
     }
 }
 

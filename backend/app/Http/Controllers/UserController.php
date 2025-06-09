@@ -8,8 +8,11 @@ use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\PasswordResetMail;
 
 class UserController extends Controller
 {
@@ -50,7 +53,11 @@ class UserController extends Controller
 
     public function update(UpdateUserRequest $request, User $user): JsonResponse
     {
-        $this->userService->update($user, $request->validated());
+        $data = $request->validated();
+        if (isset($data['password'])) {
+            $data['force_password_change'] = false;
+        }
+        $this->userService->update($user, $data);
         return response()->json($user);
     }
 
@@ -142,5 +149,35 @@ class UserController extends Controller
             ], 500)
             ->header('Content-Type', 'application/json');
         }
+    }
+
+    /**
+     * Recuperar contraseña: genera una nueva contraseña temporal, la guarda y la envía por email.
+     */
+    public function recoverPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'No existe un usuario con ese correo.'], 404);
+        }
+
+        // Generar contraseña temporal segura
+        $temporaryPassword = bin2hex(random_bytes(4)); // 8 caracteres hexadecimales
+        $user->password = Hash::make($temporaryPassword);
+        $user->force_password_change = true;
+        $user->save();
+
+        // Enviar email
+        try {
+            Mail::to($user->email)->send(new PasswordResetMail($user, $temporaryPassword));
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'No se pudo enviar el correo. ' . $e->getMessage()], 500);
+        }
+
+        return response()->json(['message' => 'Se ha enviado una nueva contraseña temporal a tu correo electrónico.']);
     }
 }

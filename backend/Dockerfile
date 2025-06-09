@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug
 
-COPY xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+# COPY xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 
 WORKDIR /var/www
 
@@ -23,6 +23,4 @@ RUN composer install --no-interaction
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-EXPOSE 8000
-
-CMD php artisan serve --host=0.0.0.0 --port=8000
+EXPOSE 9000

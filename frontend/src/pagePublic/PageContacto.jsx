@@ -73,7 +73,7 @@ const PageContacto = () => (
               </div>
               <div style={{ textAlign: 'center', color: '#388e3c', fontWeight: 'bold', fontSize: '1.05rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                 <span role="img" aria-label="ubicación" style={{ fontSize: '1.3rem' }}>📍</span>
-                Calle Ejemplo 123, 18001 Granada
+                Calle Jacinto 2, 18001 Granada
               </div>
             </Col>
           </Row>

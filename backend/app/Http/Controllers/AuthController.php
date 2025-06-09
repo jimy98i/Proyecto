@@ -52,7 +52,8 @@ class AuthController extends Controller
                 'user' => $user->id,
                 'rol' => $user->rol,
                 'nombre' => $user->nombre,
-                'email' => $user->email
+                'email' => $user->email,
+                'force_password_change' => $user->force_password_change ?? false,
             ], 200);
         } catch (\Exception $e) {
             Log::error('Error en login: ' . $e->getMessage());

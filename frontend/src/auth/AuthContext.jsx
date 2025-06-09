@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
     const [userId, setUserId] = useState(null);
     const [token, setToken] = useState(localStorage.getItem('access_token'));
     const [profileImage, setProfileImage] = useState(null);
+    const [forcePasswordChange, setForcePasswordChange] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -30,6 +31,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('userId');
         localStorage.removeItem('profile_image');
         localStorage.removeItem('user_data');
+        localStorage.removeItem('force_password_change');
         setIsAuthenticated(false);
         setUserName('');
         setUserRole('');
@@ -37,6 +39,7 @@ export const AuthProvider = ({ children }) => {
         setUserId(null);
         setToken(null);
         setProfileImage(null);
+        setForcePasswordChange(false);
         navigate('/');
     };
 
@@ -191,6 +194,10 @@ export const AuthProvider = ({ children }) => {
 
             const loginData = loginResponse;
 
+            // Guardar el flag de cambio forzado de contraseña
+            setForcePasswordChange(!!loginData.force_password_change);
+            localStorage.setItem('force_password_change', loginData.force_password_change ? 'true' : 'false');
+
             const userResponse = await get(`/user/${loginData.user}`);
             // userResponse ya es el JSON, no un objeto Response
             if (userResponse.error || userResponse.message === 'Unauthenticated.' || !userResponse.id) {
@@ -255,7 +262,9 @@ export const AuthProvider = ({ children }) => {
         token,
         profileImage,
         login,
-        logout
+        logout,
+        forcePasswordChange,
+        setForcePasswordChange
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

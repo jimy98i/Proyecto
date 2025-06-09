@@ -171,3 +171,6 @@ Route::middleware(['api'])->group(function () {
 });
 
 // Rutas para la gestión de historiales en citas
+
+// Recuperación de contraseña (sin auth)
+Route::post('/user/recover', [UserController::class, 'recoverPassword']);
