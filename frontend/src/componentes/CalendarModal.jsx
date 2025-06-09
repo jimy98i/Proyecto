@@ -71,7 +71,7 @@ const CalendarModal = ({ isOpen, onRequestClose, onSubmit, initialData, userRole
     try {
       // Si es un usuario cliente, obtener solo sus mascotas
       if (userRole === 'cliente') {
-        const response = await fetch(`${API_URL}/pet/client/${localStorage.getItem('userName')}`, {
+        const response = await fetch(`${API_URL}/pet/client/${localStorage.getItem('userId')}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('access_token')}`
           }
